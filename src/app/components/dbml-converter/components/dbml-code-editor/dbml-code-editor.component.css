@@ -1,0 +1,51 @@
+.editor-font {
+  font-family: "Consolas", "Monaco", "Courier New", monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  tab-size: 4;
+}
+
+/*
+*/
+.editor-container {
+  position: relative;
+  min-height: 200px;
+  background: white;
+  overflow: hidden;
+}
+
+/*
+  Textarea Input
+  Most styles are none, transparent or invisible
+  to allow the highlighted code to be seen
+
+  So the textarea only process the input of the user
+  Even if the background is transparent, it will be over the code (z-index)
+*/
+textarea.editor-input {
+  box-sizing: border-box;
+  color: transparent;
+  caret-color: white;
+  border: none;
+  resize: none;
+  overflow: auto;
+  white-space: pre; /* This will allow multiple lines forcing the overflow in X */
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  &:focus {
+    outline: none;
+  }
+}
+
+.editor-output {
+  box-sizing: border-box;
+  white-space: pre;
+  overflow: visible;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+}

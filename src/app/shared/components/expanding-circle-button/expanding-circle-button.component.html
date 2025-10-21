@@ -1,0 +1,32 @@
+<div class="flex space-x-2">
+  @for (option of options(); track option.id) {
+  <button
+    #buttonRef
+    type="button"
+    [attr.aria-pressed]="isOptionSelected(option.id)"
+    [style.background-color]="isOptionSelected(option.id) ? option.color : ''"
+    class="group relative px-4 py-1.5 text-sm font-medium rounded-lg flex items-center overflow-hidden transition-all duration-300 ease-out"
+    [class]="getButtonClasses(option.id)"
+    (click)="handleButtonClick(option.id, $event)"
+  >
+    <!-- Expanding circle (final background color) -->
+    <div
+      class="absolute rounded-full transition-all duration-500 ease-out"
+      [class]="getExpandingCircleClasses(option.id)"
+      [style.background-color]="option.color"
+    ></div>
+
+    <!-- Circle color indicator -->
+    <div
+      class="indicator h-3 w-3 rounded-full mr-2 relative z-10 transition-all duration-300"
+      [class]="getIndicatorClasses(option.id)"
+      [style.background-color]="
+        isOptionSelected(option.id) ? '#fff' : option.color
+      "
+    ></div>
+
+    <!-- Label -->
+    <span class="label relative z-10 font-medium">{{ option.label }}</span>
+  </button>
+  }
+</div>

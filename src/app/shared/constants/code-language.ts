@@ -1,0 +1,10 @@
+const DEFAULT_PRISM_LANGUAGE = 'typescript';
+const DEFAULT_EDITOR_LANGUAGE = 'dbml';
+
+const SUPPORTED_OUTPUT_LANGUAGES = ['json', 'nestjs', 'typeorm', 'prisma'];
+
+export {
+  DEFAULT_PRISM_LANGUAGE,
+  DEFAULT_EDITOR_LANGUAGE,
+  SUPPORTED_OUTPUT_LANGUAGES,
+};

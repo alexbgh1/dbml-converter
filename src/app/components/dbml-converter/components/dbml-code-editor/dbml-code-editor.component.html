@@ -1,0 +1,26 @@
+<div
+  #editorContainer
+  class="editor-container editor-font border border-border-muted rounded-sm"
+  [style.height]="height"
+>
+  <textarea
+    #editorTextarea
+    [(ngModel)]="code"
+    (input)="onCodeChange()"
+    (keydown)="onKeyDown($event)"
+    (scroll)="handleScroll($event)"
+    (mouseup)="onSelectionChange()"
+    (select)="onSelectionChange()"
+    class="editor-input p-4 m-0 w-full h-full bg-transparent"
+    [placeholder]="placeholder"
+    spellcheck="false"
+    wrap="off"
+  ></textarea>
+
+  <pre
+    #outputElement
+    class="editor-output bg-bg-secondary p-4 m-0"
+    [style.top.px]="-scrollTop()"
+    [style.left.px]="-scrollLeft()"
+  ><code class="language-dbml" [innerHTML]="highlighted()"></code></pre>
+</div>

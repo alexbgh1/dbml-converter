@@ -1,0 +1,80 @@
+<div
+  [class]="
+    isOpen()
+      ? 'border-b border-accent'
+      : 'hover:border-zinc-600 border-border-muted'
+  "
+  class="mb-2 border rounded-lg overflow-hidden"
+>
+  <button
+    (click)="onToggle()"
+    [class]="
+      isOpen()
+        ? 'rounded-t-lg border-b border-accent bg-accent/10'
+        : 'rounded-lg  bg-bg-secondary'
+    "
+    class="w-full px-4 py-3 flex items-center justify-between text-left"
+  >
+    <!-- Left Section: File name, chars length -->
+    <section class="flex items-center gap-2">
+      <!-- Chevron Icons -->
+      @if (isOpen()) {
+      <chevron-down-icon
+        [class]="isOpen() ? '[&>svg]:text-accent' : ''"
+        className="w-5 h-5 text-text-muted mr-2"
+      ></chevron-down-icon>
+      } @else {
+
+      <chevron-right-icon
+        className="w-5 h-5 text-text-muted mr-2"
+      ></chevron-right-icon>
+      }
+
+      <!-- File Name -->
+      <div class="flex items-center">
+        <file-icon
+          [class]="isOpen() ? '[&>svg]:text-accent' : ''"
+          className="w-4 h-4 text-text-muted mr-2"
+        ></file-icon>
+        <span
+          [class]="isOpen() ? 'font-medium text-text' : 'text-text-muted'"
+          class="font-mono text-sm"
+        >
+          {{ fileName }}
+        </span>
+      </div>
+
+      <!-- Chars count -->
+      <div class="flex items-center gap-2">
+        <span
+          class="text-text-muted inline-flex items-center justify-center rounded-md border px-2 py-0.5 font-medium w-fit whitespace-nowrap shrink-0 overflow-hidden ml-2 text-xs border-border-muted"
+          >{{ charsCount }} chars</span
+        >
+      </div>
+    </section>
+
+    <!-- Right Section: Copy & Download -->
+    <section class="flex gap-1">
+      <!-- Copy Button -->
+      <copy-file-button [textToCopy]="codeContent"></copy-file-button>
+
+      <!-- Download Button -->
+      <download-file-button
+        [textToDownload]="codeContent"
+        [fileName]="fileName"
+      ></download-file-button>
+    </section>
+  </button>
+
+  <!-- Code Viewer -->
+  @if (isOpen()) {
+  <div class="px-4 py-3 bg-accent/5">
+    <ng-content>
+      <app-code-viewer
+        [code]="codeContent"
+        [height]="'200px'"
+      ></app-code-viewer>
+    </ng-content>
+  </div>
+  }
+</div>

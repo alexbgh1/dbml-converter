@@ -1,0 +1,9 @@
+.code-block {
+  margin: 0;
+  padding: 1rem;
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  tab-size: 4;
+  white-space: pre;
+}

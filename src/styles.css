@@ -1,1 +1,45 @@
 @import "tailwindcss";
+@import "./assets/prism-vscode-theme.css";
+
+@theme {
+  --color-bg: oklch(21% 0.006 285.885);
+  --color-bg-secondary: oklch(24.4% 0.006 286.033);
+  --color-bg-tertiary: oklch(27.4% 0.006 286.033);
+
+  --color-text: oklch(97.75% 0.0079 106.55);
+  --color-text-muted: oklch(70.5% 0.015 286.067);
+
+  --color-accent: oklch(77.7% 0.152 181.912);
+  --color-accent-60: oklch(77.7% 0.152 181.912 / 0.6);
+  --color-accent-75: oklch(77.7% 0.152 181.912 / 0.75);
+  --color-accent-secondary: oklch(70% 0.18 140);
+
+  --color-border-muted: oklch(37% 0.013 285.805);
+  --color-hover-muted: oklch(37% 0.013 285.805);
+
+  --color-success: oklch(87.1% 0.2195 148.02);
+  --color-error: oklch(68.22% 0.2063 24.43);
+  --color-orange: oklch(83.39% 0.1241 66.56);
+  --color-nestjs: oklch(60.88% 0.223 14.26);
+
+  --ring: oklch(0.708 0.15 280);
+
+  --shadow-expand-sm: 0px 0px 15px 1px var(--color-accent-60);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-tertiary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-accent-75);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}

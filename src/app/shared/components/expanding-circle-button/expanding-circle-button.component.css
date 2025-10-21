@@ -1,0 +1,42 @@
+button {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  transition: all 0.3s ease;
+}
+
+button:focus-visible {
+  outline: 2px solid rgba(66, 153, 225, 0.6);
+  outline-offset: 2px;
+}
+
+button:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+}
+
+.indicator {
+  transition: transform 0.2s ease-out;
+}
+
+button:hover:not([aria-pressed="true"]) .indicator {
+  transform: scale(1.2);
+}
+
+/* Ripple effect animation */
+@keyframes ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+}
+
+.ripple {
+  animation: ripple 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  pointer-events: none;
+  z-index: 1;
+}
