@@ -1,0 +1,120 @@
+<div class="grid grid-cols-1 md:grid-cols-2">
+  <!-- ========== -->
+  <!-- LEFT SIDE - Input Section -->
+  <!-- ========== -->
+  <div class="border-r border-border-muted flex flex-col">
+    <div
+      class="flex-col px-6 py-4 pb-6 border-b border-border-muted flex justify-between"
+    >
+      <h2 class="text-sm font-medium text-text">Input</h2>
+      <div class="flex justify-between flex-row gap-2">
+        <button
+          class="text-xs text-accent hover:underline"
+          (click)="handleLoadExample()"
+        >
+          Load example DBML code
+        </button>
+
+        <div class="flex gap-2">
+          <button
+            (click)="handleConvert()"
+            class="flex items-center gap-2 cursor-pointer px-2 bg-accent/60 text-white rounded disabled:cursor-not-allowed disabled:opacity-50"
+            [disabled]="isConverting()"
+          >
+            Convert
+          </button>
+          <button
+            (click)="clearAll()"
+            class="cursor-pointer px-2 rounded text-text-muted hover:text-text"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- Editor DBML con Prism -->
+    <div class="py-6 px-6">
+      <app-dbml-code-editor
+        [class.border-red-500]="hasError()"
+        [code]="dbmlContent()"
+        [height]="'400px'"
+        (codeChange)="onDbmlInput($event)"
+      ></app-dbml-code-editor>
+    </div>
+
+    @if (hasError()) {
+    <div class="mt-2 text-sm text-red-600 dark:text-red-400">
+      {{ errorMessage() }}
+    </div>
+    }
+  </div>
+
+  <!-- ========== -->
+  <!-- RIGHT SIDE - Output Section -->
+  <!-- ========== -->
+  <div class="border-r border-border-muted flex flex-col">
+    <div class="px-6 py-4 border-b border-border-muted">
+      <h2 class="text-sm font-medium text-zinc-300">Output</h2>
+      <!-- Output type selector -->
+      <div class="flex items-center space-x-2">
+        <label class="text-sm text-gray-900 dark:text-text-muted"
+          >Output format:</label
+        >
+        <app-expanding-circle-button
+          [options]="expandingButtonOptions()"
+          [selectedId]="selectedOutputType()"
+          (optionSelected)="setOutputType($event)"
+        ></app-expanding-circle-button>
+      </div>
+    </div>
+
+    <!-- JSON Output -->
+    @if (selectedOutputType() === OUTPUT_OPTIONS.json) {
+    <div class="py-6 px-6 relative">
+      <!-- Copy & Download buttons -->
+      <div class="absolute flex right-10 top-8 gap-2">
+        <copy-file-button
+          [textToCopy]="schema() ? this.formatJson(schema()) : ''"
+        ></copy-file-button>
+        <download-file-button
+          [textToDownload]="schema() ? this.formatJson(schema()) : ''"
+          [fileName]="'schema.json'"
+        ></download-file-button>
+      </div>
+
+      <!-- JSON Output -->
+      <app-code-viewer
+        [code]="schema() ? this.formatJson(schema()) : ''"
+        [height]="'400px'"
+        language="typescript"
+      ></app-code-viewer>
+    </div>
+    }
+
+    <!-- NestJS TypeORM Output -->
+    @if (selectedOutputType() === OUTPUT_OPTIONS.typeorm) {
+    <div class="w-full overflow-y-auto rounded-sm">
+      @if (nestjsCode()) {
+      <!-- Content for entities -->
+      <div class="p-6">
+        @for (fileEntry of getEntities(nestjsCode()!.entities); track
+        fileEntry.fileName) {
+        <file-drop-down
+          [fileName]="fileEntry.fileName"
+          [charsCount]="fileEntry.code | codeChars"
+          [codeContent]="fileEntry.code"
+        ></file-drop-down>
+        }
+
+        <!-- Default Database Module -->
+        <file-drop-down
+          fileName="database.module.ts"
+          [charsCount]="nestjsCode()!.module | codeChars"
+          [codeContent]="nestjsCode()!.module"
+        ></file-drop-down>
+      </div>
+      }
+    </div>
+    }
+  </div>
+</div>

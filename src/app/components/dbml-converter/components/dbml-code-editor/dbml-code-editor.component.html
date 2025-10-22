@@ -1,6 +1,6 @@
 <div
   #editorContainer
-  class="editor-container editor-font border border-border-muted rounded-sm"
+  class="editor-container editor-font border bg-bg-secondary border-border-muted rounded-sm"
   [style.height]="height"
 >
   <textarea
@@ -11,7 +11,7 @@
     (scroll)="handleScroll($event)"
     (mouseup)="onSelectionChange()"
     (select)="onSelectionChange()"
-    class="editor-input p-4 m-0 w-full h-full bg-transparent"
+    class="editor-input p-4 m-0 w-full h-full"
     [placeholder]="placeholder"
     spellcheck="false"
     wrap="off"

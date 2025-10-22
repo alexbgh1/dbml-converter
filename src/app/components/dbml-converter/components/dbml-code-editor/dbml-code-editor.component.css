@@ -10,7 +10,6 @@
 .editor-container {
   position: relative;
   min-height: 200px;
-  background: white;
   overflow: hidden;
 }
 

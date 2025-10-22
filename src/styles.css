@@ -6,6 +6,8 @@
   --color-bg-secondary: oklch(24.4% 0.006 286.033);
   --color-bg-tertiary: oklch(27.4% 0.006 286.033);
 
+  --color-code-box-bg: oklch(23.5% 0 0);
+
   --color-text: oklch(97.75% 0.0079 106.55);
   --color-text-muted: oklch(70.5% 0.015 286.067);
 

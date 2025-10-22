@@ -2,38 +2,48 @@
   class="border-b border-zinc-700 py-4 px-6 flex justify-between items-center"
 >
   <div class="flex items-center gap-3">
-    <div class="w-4 h-4 bg-accent rounded shadow-expand-sm"></div>
-    <h1 class="text-2xl font-mono font-bold text-gray-900 dark:text-white">
-      DBML Converter
-    </h1>
+    <a [routerLink]="'/'" class="flex items-center gap-3">
+      <div class="w-4 h-4 bg-accent rounded shadow-expand-sm"></div>
+      <h1 class="text-2xl font-mono font-bold text-gray-900 dark:text-white">
+        DBML Converter
+      </h1>
+    </a>
   </div>
 
   <!-- Controls: Preview mode & Editor mode -->
-  <div class="flex gap-2">
-    <button
-      (click)="setViewMode(this.CODE_VIEW_MODE_MAP.preview)"
+  <nav class="flex gap-2">
+    <a
+      [routerLink]="this.CODE_VIEW_MODE_MAP.preview + this.DEFAULT_SUFFIX"
+      routerLinkActive
+      #previewLink="routerLinkActive"
       [class]="
-        currentMode() === this.CODE_VIEW_MODE_MAP.preview
-          ? 'bg-bg-tertiary text-accent'
-          : 'text-text-muted hover:bg-bg-secondary hover:text-text'
+        previewLink.isActive
+          ? 'bg-bg-tertiary text-accent px-3 py-1.5 rounded-lg flex items-center gap-2'
+          : 'text-text-muted hover:bg-bg-secondary hover:text-text px-3 py-1.5 rounded-lg flex items-center gap-2'
       "
-      class="text-sm font-medium px-3 py-1.5 rounded-lg flex items-center gap-2"
+      class="text-sm font-medium transition-colors"
     >
-      <preview-icon className="w-5 h-5"></preview-icon>
+      <preview-icon
+        [className]="previewLink.isActive ? 'w-5 h-5 text-accent' : 'w-5 h-5'"
+      ></preview-icon>
       Preview mode
-    </button>
+    </a>
 
-    <button
-      (click)="setViewMode(this.CODE_VIEW_MODE_MAP.editor)"
+    <a
+      [routerLink]="this.CODE_VIEW_MODE_MAP.editor + this.DEFAULT_SUFFIX"
+      routerLinkActive
+      #editorLink="routerLinkActive"
       [class]="
-        currentMode() === this.CODE_VIEW_MODE_MAP.editor
-          ? 'bg-bg-tertiary text-accent'
-          : 'text-text-muted hover:bg-bg-secondary hover:text-text'
+        editorLink.isActive
+          ? 'bg-bg-tertiary text-accent px-3 py-1.5 rounded-lg flex items-center gap-2'
+          : 'text-text-muted hover:bg-bg-secondary hover:text-text px-3 py-1.5 rounded-lg flex items-center gap-2'
       "
-      class="text-sm font-medium px-3 py-1.5 rounded-lg flex items-center gap-2"
+      class="text-sm font-medium transition-colors"
     >
-      <editor-icon className="w-5 h-5"></editor-icon>
+      <editor-icon
+        [className]="editorLink.isActive ? 'w-5 h-5 text-accent' : 'w-5 h-5'"
+      ></editor-icon>
       Editor mode
-    </button>
-  </div>
+    </a>
+  </nav>
 </div>

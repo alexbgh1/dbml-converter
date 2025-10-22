@@ -33,11 +33,6 @@ pre[class*="language-"] {
   hyphens: none;
 }
 
-pre[class*="language-"],
-:not(pre) > code[class*="language-"] {
-  background: #1e1e1e;
-}
-
 /* Highlight tokens */
 .token.comment,
 .token.prolog,
