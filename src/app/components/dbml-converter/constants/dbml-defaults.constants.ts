@@ -1,5 +1,6 @@
 const DBML_DEFAULT_VALUE = `Table users {
-  id int [pk]
+  id int [pk, increment]
+  name varchar [note: 'User full name']
 }`;
 
 const DBML_DEFAULT_EXAMPLE = `Table users {

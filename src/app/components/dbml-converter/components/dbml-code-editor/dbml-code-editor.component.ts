@@ -11,11 +11,15 @@ import {
   signal,
   effect,
   WritableSignal,
+  computed,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { DBML_DEFAULT_VALUE } from '../../constants';
 import { PrismService } from '../../../../services/prism/prism.service';
+
+import { DBML_DEFAULT_VALUE } from '../../constants';
+
+import { CodeLine } from '../../interfaces/editor.interface';
 
 /*
   This component has two main parts:
@@ -45,6 +49,14 @@ export class DbmlCodeEditorComponent implements OnChanges, AfterViewInit {
   scrollTop: WritableSignal<number> = signal(0);
   scrollLeft: WritableSignal<number> = signal(0);
   private isScrolling: WritableSignal<boolean> = signal(false);
+
+  codeLines = computed<CodeLine[]>(() => {
+    const lines = this.highlighted().split('\n');
+    return lines.map((line, index) => ({
+      number: index + 1,
+      content: line || '&nbsp;',
+    }));
+  });
 
   ngAfterViewInit(): void {
     this.syncHighlighting();
@@ -125,6 +137,20 @@ export class DbmlCodeEditorComponent implements OnChanges, AfterViewInit {
     if (event.key === 'Tab') {
       event.preventDefault();
       event.stopPropagation();
+
+      /* If empty, we update the code with placeholder text*/
+      if (!this.code) {
+        this.code = this.placeholder;
+        this.onCodeChange();
+
+        // Moving cursor to last position
+        const textarea = event.target as HTMLTextAreaElement;
+        setTimeout(() => {
+          textarea.selectionStart = textarea.selectionEnd =
+            this.placeholder.length;
+        }, 0);
+        return;
+      }
 
       const textarea = event.target as HTMLTextAreaElement;
       const start = textarea.selectionStart;

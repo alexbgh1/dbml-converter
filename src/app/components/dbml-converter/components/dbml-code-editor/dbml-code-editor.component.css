@@ -38,6 +38,18 @@ textarea.editor-input {
   }
 }
 
+.editor-input::placeholder {
+  color: rgb(113 113 122); /* zinc-500 */
+}
+
+.num-lines {
+  text-align: right;
+  color: rgb(113 113 122);
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+  display: inline-block;
+}
+
 .editor-output {
   box-sizing: border-box;
   white-space: pre;

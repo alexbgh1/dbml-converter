@@ -4,4 +4,9 @@ interface EditorFile {
   content: string;
 }
 
-export type { EditorFile };
+interface CodeLine {
+  number: number;
+  content: string;
+}
+
+export type { EditorFile, CodeLine };

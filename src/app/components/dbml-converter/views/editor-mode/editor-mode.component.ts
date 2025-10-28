@@ -76,12 +76,7 @@ export class EditorModeComponent {
 
   // Transform options
   expandingButtonOptions = computed(() =>
-    Object.values(OUTPUT_TYPES).map((type) => ({
-      id: type.id,
-      label: type.label,
-      color: type.color,
-      icon: type.icon,
-    }))
+    Object.values(OUTPUT_TYPES).map((type) => type)
   );
 
   // Shared Actions (dbml-)

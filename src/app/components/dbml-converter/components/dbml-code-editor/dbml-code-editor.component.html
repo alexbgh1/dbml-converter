@@ -3,6 +3,11 @@
   class="editor-container editor-font border bg-bg-secondary border-border-muted rounded-sm"
   [style.height]="height"
 >
+  <!--
+  Text area pl-12 comes from
+  - w-8 (32px or 2rem) for line numbers
+  - ml-4 (16px or 1rem) for gap between line numbers and code
+-->
   <textarea
     #editorTextarea
     [(ngModel)]="code"
@@ -11,7 +16,7 @@
     (scroll)="handleScroll($event)"
     (mouseup)="onSelectionChange()"
     (select)="onSelectionChange()"
-    class="editor-input p-4 m-0 w-full h-full"
+    class="editor-input py-4 m-0 w-full h-full pl-12"
     [placeholder]="placeholder"
     spellcheck="false"
     wrap="off"
@@ -19,8 +24,18 @@
 
   <pre
     #outputElement
-    class="editor-output bg-bg-secondary p-4 m-0"
+    class="flex editor-output bg-bg-secondary py-4 m-0"
     [style.top.px]="-scrollTop()"
     [style.left.px]="-scrollLeft()"
-  ><code class="language-dbml" [innerHTML]="highlighted()"></code></pre>
+  >
+  <!-- Line numbers (correlative code lines) -->
+   <!-- w-8: fixed width for line numbers (1234 max responsivity) -->
+    <div class="flex flex-col  items-end w-8 pointer-events-none z-3">
+      @for (line of codeLines(); track line.number) {
+      <div
+        class="num-lines"
+      >{{ line.number }}</div>
+      }
+    </div>
+  <code class="ml-4 language-dbml" [innerHTML]="highlighted()"></code></pre>
 </div>

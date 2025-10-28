@@ -17,24 +17,24 @@ const OUTPUT_TYPES: Record<OutputOption, OutputType> = {
     id: 'json',
     label: 'JSON',
     description: 'Json representation of the database schema',
-    color: '#5B9BD5',
     icon: 'curly-braces',
+    classNames: 'bg-json',
   },
   // TypeORM as Orange
   typeorm: {
     id: 'typeorm',
     label: 'TypeORM',
     description: 'TypeORM entities code',
-    color: '#ff7733',
     icon: 'typeorm',
+    classNames: 'bg-typeorm',
   },
   // Prisma as Indigo
   prisma: {
     id: 'prisma',
     label: 'Prisma',
     description: 'Prisma schema code',
-    color: '#5a67d8',
     icon: 'prisma',
+    classNames: 'bg-prisma',
   },
 };
 

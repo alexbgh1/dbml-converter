@@ -13,6 +13,6 @@ export interface OutputType {
   id: OutputOption;
   label: string;
   description: string;
-  color: string;
   icon: string;
+  classNames?: string;
 }
