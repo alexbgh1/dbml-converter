@@ -1,0 +1,48 @@
+<div
+  class="bg-zinc-900 border border-border-muted rounded-lg shadow-sm overflow-hidden transition-all duration-300 group-hover:shadow-teal-500/20 group-hover:border-teal-500/30"
+>
+  <!-- Editor Header -->
+  <div
+    class="bg-zinc-800 border-b border-border-muted px-3 sm:px-4 py-2 flex items-center gap-2"
+  >
+    <div class="flex gap-1.5">
+      <div
+        class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500/80 group-hover:bg-red-500 transition-colors"
+      ></div>
+      <div
+        class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500/80 group-hover:bg-yellow-500 transition-colors"
+      ></div>
+      <div
+        class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500/80 group-hover:bg-green-500 transition-colors"
+      ></div>
+    </div>
+    <span class="text-xs text-text/80 ml-2">schema.dbml</span>
+  </div>
+
+  <!-- Editor Content with Line Numbers -->
+  <div class="p-3 sm:p-4 overflow-x-auto bg-zinc-900">
+    <div class="font-mono text-xs sm:text-sm">
+      @for (line of codeLines(); track line.number) {
+      <div class="flex gap-2 sm:gap-3 leading-relaxed">
+        <span
+          class="text-zinc-600 select-none min-w-[1.5rem] text-right shrink-0"
+        >
+          {{ line.number }}
+        </span>
+        <code class="flex-1 language-dbml" [innerHTML]="line.content"></code>
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- Editor Footer -->
+  <div
+    class="bg-zinc-800 border-t border-zinc-700 px-3 sm:px-4 py-1.5 flex items-center justify-between text-xs text-zinc-500"
+  >
+    <span class="text-text-muted/80">DBML</span>
+    <span class="flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+      UTF-8
+    </span>
+  </div>
+</div>

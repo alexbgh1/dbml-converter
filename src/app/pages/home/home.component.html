@@ -1,0 +1,85 @@
+<div class="min-h-[calc(100vh-65px)] relative overflow-hidden bg-black/60">
+  <!-- Animated gradient blobs -->
+  <div class="absolute inset-0 pointer-events-none overflow-hidden">
+    <!-- Accent blob (teal) -->
+    <div
+      class="absolute w-136 h-136 rounded-full blur-3xl opacity-20 animate-blob"
+      style="
+        background: radial-gradient(
+          circle,
+          oklch(77.7% 0.152 181.912 / 0.4) 20%,
+          transparent 70%
+        );
+        top: 10%;
+        left: 10%;
+      "
+    ></div>
+
+    <!-- JSON blob (blue) -->
+    <div
+      class="absolute w-96 h-96 rounded-full blur-3xl opacity-15 animate-blob"
+      style="
+        background: radial-gradient(
+          circle,
+          oklch(67% 0.11 247 / 0.4) 15%,
+          transparent 70%
+        );
+        top: 20%;
+        right: 10%;
+      "
+    ></div>
+
+    <!-- Prisma blob (purple) -->
+    <div
+      class="absolute w-72 h-72 rounded-full blur-3xl opacity-15 animate-blob"
+      style="
+        background: radial-gradient(
+          circle,
+          oklch(56.31% 0.1717 274.55 / 0.4) 0%,
+          transparent 70%
+        );
+        bottom: 20%;
+        left: 20%;
+      "
+    ></div>
+
+    <!-- TypeORM blob (orange) -->
+    <div
+      class="absolute w-64 h-64 rounded-full blur-3xl opacity-12 animate-blob"
+      style="
+        background: radial-gradient(
+          circle,
+          oklch(72% 0.18 44 / 0.4) 0%,
+          transparent 70%
+        );
+        bottom: 10%;
+        right: 20%;
+      "
+    ></div>
+
+    <!-- Grid pattern -->
+    <div
+      class="absolute inset-0 bg-[linear-gradient(to_right,#2e2e2e_1px,transparent_1px),linear-gradient(to_bottom,#2e2e2e_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] opacity-20"
+    ></div>
+  </div>
+
+  <!-- Content -->
+  <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div
+      class="flex flex-col lg:grid lg:grid-cols-2 gap-12 lg:gap-32 items-center min-h-[calc(100vh-65px)] py-12 lg:py-0"
+    >
+      <!-- Left Column: Content -->
+      <div class="mb-6 lg:mb-24">
+        <app-title></app-title>
+      </div>
+
+      <!-- Right Column: Visualization -->
+      <div class="relative max-w-lg">
+        <div class="relative flex flex-col items-center gap-8 lg:gap-12">
+          <app-code-editor></app-code-editor>
+          <app-output-files></app-output-files>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

@@ -1,7 +1,18 @@
 @import "tailwindcss";
 @import "./assets/prism-vscode-theme.css";
 
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  src: url("/fonts/Plus_Jakarta_Sans/static/PlusJakartaSans-Regular.ttf")
+    format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
+  --font-jakarta-sans: "Plus Jakarta Sans", sans-serif;
+
   --color-bg: oklch(21% 0.006 285.885);
   --color-bg-secondary: oklch(24.4% 0.006 286.033);
   --color-bg-tertiary: oklch(27.4% 0.006 286.033);
@@ -21,12 +32,42 @@
 
   --color-success: oklch(87.1% 0.2195 148.02);
   --color-error: oklch(68.22% 0.2063 24.43);
-  --color-orange: oklch(83.39% 0.1241 66.56);
-  --color-nestjs: oklch(60.88% 0.223 14.26);
+
+  --color-json: oklch(67% 0.11 247);
+  --color-typeorm: oklch(72% 0.18 44);
+  --color-prisma: oklch(56.31% 0.1717 274.55);
 
   --ring: oklch(0.708 0.15 280);
 
   --shadow-expand-sm: 0px 0px 15px 1px var(--color-accent-60);
+
+  /* Professional glows - Subtle and elegant */
+  /* JSON - Blue glow */
+  --shadow-glow-json: 0 0 0 1px oklch(67% 0.11 247 / 0.1),
+    0 4px 12px oklch(67% 0.11 247 / 0.15), 0 8px 24px oklch(67% 0.11 247 / 0.08);
+
+  /* Prisma - Purple glow */
+  --shadow-glow-prisma: 0 0 0 1px oklch(56.31% 0.1717 274.55 / 0.1),
+    0 4px 12px oklch(56.31% 0.1717 274.55 / 0.15),
+    0 8px 24px oklch(56.31% 0.1717 274.55 / 0.08);
+
+  /* TypeORM - Orange glow */
+  --shadow-glow-typeorm: 0 0 0 1px oklch(72% 0.18 44 / 0.1),
+    0 4px 12px oklch(72% 0.18 44 / 0.15), 0 8px 24px oklch(72% 0.18 44 / 0.08);
+
+  /* Alternative: Even more subtle for less prominent cards */
+  --shadow-glow-json-sm: 0 2px 8px oklch(67% 0.11 247 / 0.12),
+    0 4px 16px oklch(67% 0.11 247 / 0.06);
+
+  --shadow-glow-prisma-sm: 0 2px 8px oklch(56.31% 0.1717 274.55 / 0.12),
+    0 4px 16px oklch(56.31% 0.1717 274.55 / 0.06);
+
+  --shadow-glow-typeorm-sm: 0 2px 8px oklch(72% 0.18 44 / 0.12),
+    0 4px 16px oklch(72% 0.18 44 / 0.06);
+}
+
+body {
+  font-family: var(--font-jakarta-sans);
 }
 
 ::-webkit-scrollbar {
@@ -44,4 +85,38 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-accent);
+}
+
+/* Hero blob */
+@keyframes blob {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  25% {
+    transform: translate(20px, -20px) scale(1.1);
+  }
+  50% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  75% {
+    transform: translate(20px, 10px) scale(1.05);
+  }
+}
+
+.animate-blob {
+  animation: blob 20s ease-in-out infinite;
+}
+
+/* Delays para los blobs */
+.animate-blob:nth-child(2) {
+  animation-delay: 2s;
+}
+
+.animate-blob:nth-child(3) {
+  animation-delay: 4s;
+}
+
+.animate-blob:nth-child(4) {
+  animation-delay: 6s;
 }

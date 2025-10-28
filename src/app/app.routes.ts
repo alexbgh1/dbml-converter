@@ -14,6 +14,11 @@ export const routes: Routes = [
           import('./pages/home/home.component').then((m) => m.HomeComponent),
       },
       {
+        path: 'docs',
+        loadComponent: () =>
+          import('./pages/docs/docs.component').then((m) => m.DocsComponent),
+      },
+      {
         path: 'preview-mode',
         loadComponent: () =>
           import(

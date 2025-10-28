@@ -1,0 +1,70 @@
+<!-- Mobile/Tablet: Vertical Stack -->
+<div class="lg:hidden flex flex-col gap-6 sm:gap-6 w-full">
+  <!-- File 1 -->
+  <div
+    class="w-full bg-bg border border-json/50 rounded-lg shadow-glow-json-sm hover:shadow-glow-json p-3 sm:p-4 transition-all hover:border-json/70 hover:scale-102 cursor-pointer"
+  >
+    <div class="flex items-start gap-3">
+      <div
+        class="w-10 h-12 bg-json/20 border border-json/30 rounded flex items-center justify-center flex-shrink-0 transition-all hover:bg-json/30"
+      >
+        <file-icon className="w-5 h-5 text-json"></file-icon>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-xs text-zinc-400 mb-1 sm:mb-1.5 font-mono">
+          schema.json
+        </div>
+        <div
+          class="text-xs sm:text-sm font-mono token string-property property mb-1"
+        >
+          <span [innerHTML]="LEFT_CURLY_BRACE"></span> tables: [...]
+          <span [innerHTML]="RIGHT_CURLY_BRACE"></span>
+        </div>
+        <div class="text-xs text-zinc-600">JSON Schema</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- File 2 -->
+
+  <div
+    class="w-full bg-bg border border-typeorm/50 rounded-lg shadow-glow-typeorm-sm hover:shadow-glow-typeorm p-3 sm:p-4 transition-all hover:border-typeorm/70 hover:scale-102 cursor-pointer"
+  >
+    <div class="flex items-start gap-3">
+      <div
+        class="w-10 h-12 bg-typeorm/20 border border-typeorm/30 rounded flex items-center justify-center flex-shrink-0 transition-all hover:bg-typeorm/30"
+      >
+        <file-icon className="w-5 h-5 text-typeorm"></file-icon>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-xs text-zinc-400 mb-1 sm:mb-1.5 font-mono">
+          user.entity.ts
+        </div>
+        <div class="text-xs sm:text-sm font-mono token function mb-1">
+          <span [innerHTML]="AT_SYMBOL"></span>Entity('users')
+        </div>
+        <div class="text-xs text-zinc-600">TypeORM Entity</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- File 3 -->
+  <div
+    class="w-full bg-bg border border-prisma/50 rounded-lg shadow-glow-prisma-sm hover:shadow-glow-prisma p-3 sm:p-4 transition-all hover:border-prisma/70 hover:scale-102 cursor-pointer"
+  >
+    <div class="flex items-start gap-3">
+      <div
+        class="w-10 h-12 bg-prisma/20 border border-prisma/30 rounded flex items-center justify-center flex-shrink-0 transition-all hover:bg-prisma/30"
+      >
+        <file-icon className="w-5 h-5 text-prisma"></file-icon>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-xs text-zinc-400 mb-1 sm:mb-1.5 font-mono">
+          schema.prisma
+        </div>
+        <div class="text-xs sm:text-sm font-mono text-white mb-1">model</div>
+        <div class="text-xs text-zinc-600">Prisma Schema</div>
+      </div>
+    </div>
+  </div>
+</div>

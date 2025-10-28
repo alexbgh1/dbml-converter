@@ -1,17 +1,40 @@
 <div
-  class="border-b border-zinc-700 py-4 px-6 flex justify-between items-center"
+  class="border-b border-zinc-700 py-4 px-6 flex justify-between items-center relative"
 >
   <div class="flex items-center gap-3">
     <a [routerLink]="'/'" class="flex items-center gap-3">
       <div class="w-4 h-4 bg-accent rounded shadow-expand-sm"></div>
-      <h1 class="text-2xl font-mono font-bold text-gray-900 dark:text-white">
-        DBML Converter
-      </h1>
+      <h1 class="text-2xl font-mono font-bold text-white">DBML Converter</h1>
     </a>
   </div>
 
-  <!-- Controls: Preview mode & Editor mode -->
-  <nav class="flex gap-2">
+  <!-- Burger Button (visible on sm/md) -->
+  <button
+    (click)="toggleMenu()"
+    class="md:hidden text-text-muted hover:text-accent transition-colors p-2"
+    aria-label="Toggle menu"
+  >
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        *ngIf="!isMenuOpen"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M4 6h16M4 12h16M4 18h16"
+      />
+      <path
+        *ngIf="isMenuOpen"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M6 18L18 6M6 6l12 12"
+      />
+    </svg>
+  </button>
+
+  <!-- Desktop Navigation (hidden on sm/md) -->
+  <nav class="hidden md:flex gap-2">
+    <!-- Preview mode -->
     <a
       [routerLink]="this.CODE_VIEW_MODE_MAP.preview + this.DEFAULT_SUFFIX"
       routerLinkActive
@@ -29,6 +52,7 @@
       Preview mode
     </a>
 
+    <!-- Editor mode -->
     <a
       [routerLink]="this.CODE_VIEW_MODE_MAP.editor + this.DEFAULT_SUFFIX"
       routerLinkActive
@@ -45,5 +69,114 @@
       ></editor-icon>
       Editor mode
     </a>
+
+    <!-- Docs -->
+    <a
+      routerLink="/docs"
+      routerLinkActive
+      #fileDocsLink="routerLinkActive"
+      [class]="
+        fileDocsLink.isActive
+          ? 'bg-bg-tertiary text-accent px-3 py-1.5 rounded-lg flex items-center gap-2'
+          : 'text-text-muted hover:bg-bg-secondary hover:text-text px-3 py-1.5 rounded-lg flex items-center gap-2'
+      "
+      class="text-sm font-medium transition-colors"
+    >
+      <file-docs-icon
+        [className]="fileDocsLink.isActive ? 'w-5 h-5 text-accent' : 'w-5 h-5'"
+      ></file-docs-icon>
+      Docs
+    </a>
   </nav>
+
+  <!-- Mobile Menu (absolute positioning, appears over content) -->
+  <div
+    *ngIf="isMenuOpen"
+    class="absolute top-full left-0 right-0 md:hidden border-b border-zinc-700 bg-bg-secondary shadow-lg z-50"
+  >
+    <nav class="flex flex-col p-4 gap-2">
+      <!-- Home -->
+      <a
+        [routerLink]="'/'"
+        routerLinkActive
+        [routerLinkActiveOptions]="{ exact: true }"
+        #homeLink="routerLinkActive"
+        (click)="closeMenu()"
+        [class]="
+          homeLink.isActive
+            ? 'bg-bg-tertiary text-accent px-3 py-2 rounded-lg flex items-center gap-2'
+            : 'text-text-muted hover:bg-bg-tertiary hover:text-text px-3 py-2 rounded-lg flex items-center gap-2'
+        "
+        class="text-sm font-medium transition-colors"
+      >
+        <home-icon
+          [className]="homeLink.isActive ? 'w-5 h-5 text-accent' : 'w-5 h-5'"
+        ></home-icon>
+        Home
+      </a>
+
+      <!-- Preview mode -->
+      <a
+        [routerLink]="this.CODE_VIEW_MODE_MAP.preview + this.DEFAULT_SUFFIX"
+        routerLinkActive
+        #previewLinkMobile="routerLinkActive"
+        (click)="closeMenu()"
+        [class]="
+          previewLinkMobile.isActive
+            ? 'bg-bg-tertiary text-accent px-3 py-2 rounded-lg flex items-center gap-2'
+            : 'text-text-muted hover:bg-bg-tertiary hover:text-text px-3 py-2 rounded-lg flex items-center gap-2'
+        "
+        class="text-sm font-medium transition-colors"
+      >
+        <preview-icon
+          [className]="
+            previewLinkMobile.isActive ? 'w-5 h-5 text-accent' : 'w-5 h-5'
+          "
+        ></preview-icon>
+        Preview mode
+      </a>
+
+      <!-- Editor mode -->
+      <a
+        [routerLink]="this.CODE_VIEW_MODE_MAP.editor + this.DEFAULT_SUFFIX"
+        routerLinkActive
+        #editorLinkMobile="routerLinkActive"
+        [class]="
+          editorLinkMobile.isActive
+            ? 'bg-bg-tertiary text-accent px-3 py-2 rounded-lg flex items-center gap-2'
+            : 'text-text-muted hover:bg-bg-tertiary hover:text-text px-3 py-2 rounded-lg flex items-center gap-2'
+        "
+        class="text-sm font-medium transition-colors"
+        (click)="closeMenu()"
+      >
+        <editor-icon
+          [className]="
+            editorLinkMobile.isActive ? 'w-5 h-5 text-accent' : 'w-5 h-5'
+          "
+        ></editor-icon>
+        Editor mode
+      </a>
+
+      <!-- Docs -->
+      <a
+        routerLink="/docs"
+        routerLinkActive
+        #fileDocsLinkMobile="routerLinkActive"
+        [class]="
+          fileDocsLinkMobile.isActive
+            ? 'bg-bg-tertiary text-accent px-3 py-2 rounded-lg flex items-center gap-2'
+            : 'text-text-muted hover:bg-bg-tertiary hover:text-text px-3 py-2 rounded-lg flex items-center gap-2'
+        "
+        class="text-sm font-medium transition-colors"
+        (click)="closeMenu()"
+      >
+        <file-docs-icon
+          [className]="
+            fileDocsLinkMobile.isActive ? 'w-5 h-5 text-accent' : 'w-5 h-5'
+          "
+        ></file-docs-icon>
+        Docs
+      </a>
+    </nav>
+  </div>
 </div>

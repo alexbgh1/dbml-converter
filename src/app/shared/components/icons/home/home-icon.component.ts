@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { cn } from '../../../utils/cn';
 
 @Component({
-  selector: 'preview-icon',
+  selector: 'home-icon',
   template: `
     <svg
       [class]="mergedClassList()"
@@ -14,12 +14,14 @@ import { cn } from '../../../utils/cn';
       stroke-linecap="round"
       stroke-linejoin="round"
     >
-      <rect width="18" height="18" x="3" y="3" rx="2" />
-      <path d="M12 3v18" />
+      <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+      <path
+        d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+      />
     </svg>
   `,
 })
-export class PreviewIconComponent {
+export class HomeIconComponent {
   baseClass: string = 'w-8 h-8';
   @Input() className: string = '';
 

@@ -1,0 +1,127 @@
+<!-- Desktop: Triangular Layout -->
+<div class="hidden lg:block relative w-96 h-80 xl:h-96">
+  <!-- Connecting Lines -->
+  <svg
+    class="absolute inset-0 w-full h-full pointer-events-none"
+    [attr.viewBox]="SVG_VIEWBOX"
+    [style.opacity]="SVG_OPACITY"
+    preserveAspectRatio="none"
+  >
+    @for (line of SVG_LINES; track $index) {
+    <line
+      [attr.x1]="line.x1"
+      [attr.y1]="line.y1"
+      [attr.x2]="line.x2"
+      [attr.y2]="line.y2"
+      [attr.stroke]="line.stroke"
+      [attr.stroke-width]="line.strokeWidth"
+      [attr.stroke-dasharray]="line.strokeDasharray"
+      [style.animation-delay]="line.animationDelay"
+      class="animate-dash"
+    />
+    }
+
+    <defs>
+      <!-- Colors comes from styles.css -->
+      <!-- --color-json: oklch(67% 0.11 247); -->
+      <!-- --color-typeorm: oklch(72% 0.18 44);-->
+      <!-- --color-prisma: oklch(56.31% 0.1717 274.55);  -->
+
+      <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop
+          offset="0%"
+          style="stop-color: rgb(89, 155, 213); stop-opacity: 0.9"
+        />
+        <stop
+          offset="60%"
+          style="stop-color: rgb(90, 103, 216); stop-opacity: 0.9"
+        />
+      </linearGradient>
+
+      <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop
+          offset="0%"
+          style="stop-color: rgb(89, 155, 213); stop-opacity: 0.9"
+        />
+        <stop
+          offset="100%"
+          style="stop-color: rgb(253, 120, 55); stop-opacity: 0.9"
+        />
+      </linearGradient>
+      <linearGradient id="gradient3" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop
+          offset="0%"
+          style="stop-color: rgb(90, 103, 216); stop-opacity: 0.9"
+        />
+        <stop
+          offset="100%"
+          style="stop-color: rgb(253, 120, 55); stop-opacity: 0.9"
+        />
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <!-- File 1 - Top -->
+  <div
+    class="absolute top-0 left-1/2 -translate-x-1/2 w-58 xl:w-56 bg-bg border border-json/50 rounded-lg shadow-glow-json-sm hover:shadow-glow-json-sm p-4 transition-all hover:border-json/70 hover:scale-102 cursor-pointer"
+    style="animation-delay: 1.6s"
+  >
+    <div class="flex items-start gap-3">
+      <div
+        class="w-10 h-12 bg-json/20 border border-json/30 rounded flex items-center justify-center flex-shrink-0 transition-all duration-300 hover:bg-json/30"
+      >
+        <file-icon className="w-5 h-5 text-json"></file-icon>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-xs text-zinc-400 mb-1.5 font-mono">schema.json</div>
+        <div class="text-sm font-mono token string-property property mb-1">
+          <span [innerHTML]="LEFT_CURLY_BRACE"></span>
+          tables: [...]
+          <span [innerHTML]="RIGHT_CURLY_BRACE"></span>
+        </div>
+        <div class="text-xs text-zinc-600">JSON Schema</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- File 2 - Bottom Left -->
+  <div
+    class="absolute -bottom-4 -left-2 xl:bottom-0 xl:left-0 w-58 xl:w-56 bg-bg border border-prisma/50 rounded-lg shadow-glow-prisma-sm hover:shadow-glow-prisma-sm p-4 transition-all hover:border-prisma/70 hover:scale-102 cursor-pointer"
+    style="animation-delay: 1.2s"
+  >
+    <div class="flex items-start gap-3">
+      <div
+        class="w-10 h-12 bg-prisma/20 border border-prisma/30 rounded flex items-center justify-center flex-shrink-0 transition-all duration-300 hover:bg-prisma/30"
+      >
+        <file-icon className="w-5 h-5 text-prisma"></file-icon>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-xs text-zinc-400 mb-1.5 font-mono">schema.prisma</div>
+        <div class="text-sm font-mono text-prisma mb-1">model</div>
+        <div class="text-xs text-zinc-600">Prisma Schema</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- File 3 - Bottom Right -->
+
+  <div
+    class="absolute bottom-24 xl:bottom-28 -right-4 w-58 xl:w-56 bg-bg border border-typeorm/50 rounded-lg shadow-glow-typeorm-sm hover:shadow-glow-typeorm-sm p-4 transition-all hover:border-typeorm/70 hover:scale-102 cursor-pointer"
+    style="animation-delay: 0.8s"
+  >
+    <div class="flex items-start gap-3">
+      <div
+        class="w-10 h-12 bg-typeorm/20 border border-typeorm/30 rounded flex items-center justify-center flex-shrink-0 transition-all duration-300 hover:bg-typeorm/30"
+      >
+        <file-icon className="w-5 h-5 text-typeorm"></file-icon>
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="text-xs text-zinc-400 mb-1.5 font-mono">user.entity.ts</div>
+        <div class="text-xs sm:text-sm font-mono token function mb-1">
+          <span [innerHTML]="AT_SYMBOL"></span>Entity('users')
+        </div>
+        <div class="text-xs text-zinc-600">TypeORM Entity</div>
+      </div>
+    </div>
+  </div>
+</div>

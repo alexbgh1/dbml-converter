@@ -2,7 +2,8 @@ import { Component, Input } from '@angular/core';
 import { cn } from '../../../utils/cn';
 
 @Component({
-  selector: 'preview-icon',
+  selector: 'arrow-right-icon',
+  standalone: true,
   template: `
     <svg
       [class]="mergedClassList()"
@@ -14,12 +15,12 @@ import { cn } from '../../../utils/cn';
       stroke-linecap="round"
       stroke-linejoin="round"
     >
-      <rect width="18" height="18" x="3" y="3" rx="2" />
-      <path d="M12 3v18" />
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
     </svg>
   `,
 })
-export class PreviewIconComponent {
+export class ArrowRightIconComponent {
   baseClass: string = 'w-8 h-8';
   @Input() className: string = '';
 

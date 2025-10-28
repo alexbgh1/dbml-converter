@@ -13,10 +13,10 @@ import { cn } from '../../../utils/cn';
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"
-      class="lucide lucide-chevrons-right-left-icon lucide-chevrons-right-left"
     >
-      <path d="m20 17-5-5 5-5" />
-      <path d="m4 17 5-5-5-5" />
+      <rect width="18" height="18" x="3" y="3" rx="2" />
+      <path d="M3 9h18" />
+      <path d="M9 21V9" />
     </svg>
   `,
 })

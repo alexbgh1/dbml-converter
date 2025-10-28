@@ -189,6 +189,7 @@ export class ${className} {
     // Normal columns
     const columnOptions: string[] = [`type: '${typeormType}'`];
     if (column.nullable === false) columnOptions.push('nullable: false');
+    if (column.unique) columnOptions.push('unique: true');
     if (column.default !== undefined)
       columnOptions.push(`default: ${JSON.stringify(column.default)}`);
 
@@ -197,8 +198,6 @@ export class ${className} {
     if (column.pk) {
       decorators.push('@PrimaryColumn()');
     }
-
-    if (column.unique) decorators.push('@Unique()');
 
     return `${comment}${decorators.join('\n  ')}\n  ${
       column.name
@@ -219,7 +218,6 @@ export class ${className} {
           imports.add('PrimaryColumn');
         }
       }
-      if (column.unique) imports.add('Unique');
       if (column.ref) {
         if (column.unique) {
           imports.add('OneToOne');

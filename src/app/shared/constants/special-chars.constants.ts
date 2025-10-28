@@ -1,0 +1,5 @@
+const AT_SYMBOL = '&#64;';
+const LEFT_CURLY_BRACE = '&#123;';
+const RIGHT_CURLY_BRACE = '&#125;';
+
+export { AT_SYMBOL, LEFT_CURLY_BRACE, RIGHT_CURLY_BRACE };
