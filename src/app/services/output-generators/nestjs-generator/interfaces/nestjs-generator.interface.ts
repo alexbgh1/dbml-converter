@@ -12,14 +12,14 @@ export interface GeneratedCode {
 
 export interface CodeGenerationOptions {
   /**
-   * Directorio base para los imports relativos
-   * Por defecto es './'
+   * Base directory for generated files
+   * by default is ./
    */
   baseDir?: string;
 
   /**
-   * Incluir comentarios explicativos en el código generado
-   * Por defecto es true
+   * Include explanatory comments in the generated code
+   * by default is true
    */
   includeComments?: boolean;
 }

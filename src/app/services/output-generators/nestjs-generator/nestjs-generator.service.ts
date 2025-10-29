@@ -211,6 +211,11 @@ export class ${className} {
       }: ${mapDbTypeToTsType(column.type)};`;
     }
 
+    // Handle special timestamp columns (created_at, updated_at)
+    if (this.isTimestampColumn(column)) {
+      return this.generateTimestampColumn(column, comment);
+    }
+
     // Normal columns
     const columnOptions: string[] = [`type: '${typeormType}'`];
     if (column.nullable === false) columnOptions.push('nullable: false');
@@ -246,6 +251,14 @@ export class ${className} {
           imports.add('ManyToOne');
         }
         imports.add('JoinColumn');
+      }
+
+      // Add special timestamp decorators
+      if (this.isTimestampColumn(column)) {
+        const columnName = column.name.toLowerCase();
+        if (columnName === 'created_at') imports.add('CreateDateColumn');
+        if (columnName === 'updated_at') imports.add('UpdateDateColumn');
+        if (columnName === 'deleted_at') imports.add('DeleteDateColumn');
       }
     }
 
@@ -361,6 +374,46 @@ export class ${className} {
     }
 
     return relations.join('\n\n  ');
+  }
+
+  /*
+  Check if column is a special timestamp column (created_at, updated_at)
+  */
+  private isTimestampColumn(column: Column): boolean {
+    const isTimestampType = ['timestamp', 'timestamptz', 'datetime'].includes(
+      column.type.toLowerCase()
+    );
+    const isSpecialName = ['created_at', 'updated_at', 'deleted_at'].includes(
+      column.name.toLowerCase()
+    );
+    return isTimestampType && isSpecialName;
+  }
+
+  /*
+  Generate special timestamp column decorators,
+  e.g., @CreateDateColumn for created_at, using TypeORM to handle automatic timestamps.
+
+  */
+  private generateTimestampColumn(column: Column, comment: string): string {
+    const columnName = column.name.toLowerCase();
+    const tsType = mapDbTypeToTsType(column.type);
+
+    if (columnName === 'created_at') {
+      return `${comment}@CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })\n  ${column.name}: ${tsType};`;
+    }
+
+    if (columnName === 'updated_at') {
+      return `${comment}@UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })\n  ${column.name}: ${tsType};`;
+    }
+
+    if (columnName === 'deleted_at') {
+      return `${comment}@DeleteDateColumn({ type: 'timestamptz', nullable: true })\n  ${column.name}: ${tsType};`;
+    }
+
+    // Fallback to normal column
+    return `${comment}@Column({ type: '${mapDbTypeToTypeOrmType(
+      column.type
+    )}' })\n  ${column.name}: ${tsType};`;
   }
 
   /*

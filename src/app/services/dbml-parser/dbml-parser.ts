@@ -175,6 +175,7 @@ export class DbmlParserService {
   /*
     Detects if a junction table exists for many-to-many relations.
     Only Many-to-Many relations are considered.
+    If the junction table exists, it validates and enhances it.
   */
   private detectJunctionTable(
     schema: DatabaseSchema,
@@ -403,7 +404,7 @@ export class DbmlParserService {
       const [, name, type, attributes] = columnWithAttrsMatch;
       const column: Column = { name, type };
 
-      // Parse attributes en array
+      // Parse attributes array
       const attributeList = attributes
         .split(',')
         .map((attr: string) => attr.trim());
