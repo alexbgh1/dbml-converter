@@ -7,6 +7,7 @@ import {
   DatabaseSchema,
   Table,
   Column,
+  Cardinality,
 } from '../../dbml-parser/interfaces/dbml-parser.interface';
 
 import {
@@ -128,6 +129,25 @@ export class ${className} {
     const comment = column.note ? `/** ${column.note} */\n  ` : '';
     const decorators: string[] = [];
 
+    // Skip many-to-many references on primary keys
+    if (
+      column.ref &&
+      column.ref.cardinality?.from === Cardinality.Many &&
+      column.ref.cardinality?.to === Cardinality.Many
+    ) {
+      // This is handled by the junction table, just render as PK
+      if (column.pk) {
+        if (column.increment) {
+          decorators.push("@PrimaryGeneratedColumn('increment')");
+        } else {
+          decorators.push('@PrimaryColumn()');
+        }
+        return `${comment}${decorators.join('\n  ')}\n  ${
+          column.name
+        }: ${mapDbTypeToTsType(column.type)};`;
+      }
+    }
+
     // Handle foreign key relationships
     if (column.ref) {
       const relatedTable = schema.tables.find(
@@ -178,9 +198,14 @@ export class ${className} {
       )}\n  ${relationProperty}: ${relatedClassName};`;
     }
 
-    // Handle primary key with increment - use @PrimaryGeneratedColumn
-    if (column.pk && column.increment) {
-      decorators.push("@PrimaryGeneratedColumn('increment')");
+    // Handle primary keys
+    if (column.pk) {
+      if (column.increment) {
+        decorators.push("@PrimaryGeneratedColumn('increment')");
+      } else {
+        decorators.push('@PrimaryColumn()');
+      }
+
       return `${comment}${decorators.join('\n  ')}\n  ${
         column.name
       }: ${mapDbTypeToTsType(column.type)};`;
@@ -194,10 +219,6 @@ export class ${className} {
       columnOptions.push(`default: ${JSON.stringify(column.default)}`);
 
     decorators.push(`@Column({ ${columnOptions.join(', ')} })`);
-
-    if (column.pk) {
-      decorators.push('@PrimaryColumn()');
-    }
 
     return `${comment}${decorators.join('\n  ')}\n  ${
       column.name
@@ -270,19 +291,20 @@ export class ${className} {
     }
 
     // Reverse relations
-    for (const relation of schema.relations) {
-      if (relation.to.table === table.name) {
-        const fromTable = schema.tables.find(
-          (t) => t.name === relation.from.table
+    for (const otherTable of schema.tables) {
+      if (otherTable.name === table.name) continue;
+
+      const foreignKeys = otherTable.columns.filter(
+        (col) => col.ref?.table === table.name
+      );
+
+      if (foreignKeys.length > 0) {
+        const className = this.getClassName(otherTable.name);
+        const fileName = this.getEntityFileName(otherTable.name).replace(
+          '.ts',
+          ''
         );
-        if (fromTable && fromTable.name !== table.name) {
-          const className = this.getClassName(fromTable.name);
-          const fileName = this.getEntityFileName(fromTable.name).replace(
-            '.ts',
-            ''
-          );
-          imports.add(`import { ${className} } from './${fileName}';`);
-        }
+        imports.add(`import { ${className} } from './${fileName}';`);
       }
     }
 

@@ -19,6 +19,28 @@ export enum RelationOperator {
   ManyToMany = '<>',
 }
 
+export const CARDINALITY_MAP: Record<
+  RelationOperator,
+  { from: Cardinality; to: Cardinality }
+> = {
+  [RelationOperator.ManyToOne]: {
+    from: Cardinality.Many,
+    to: Cardinality.One,
+  },
+  [RelationOperator.OneToMany]: {
+    from: Cardinality.One,
+    to: Cardinality.Many,
+  },
+  [RelationOperator.ManyToMany]: {
+    from: Cardinality.Many,
+    to: Cardinality.Many,
+  },
+  [RelationOperator.OneToOne]: {
+    from: Cardinality.One,
+    to: Cardinality.One,
+  },
+};
+
 export type ColumnAttribute =
   (typeof COLUMN_ATTRIBUTES)[keyof typeof COLUMN_ATTRIBUTES][number];
 

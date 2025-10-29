@@ -14,6 +14,7 @@ import {
   Table,
   Cardinality,
   RelationOperator,
+  CARDINALITY_MAP,
 } from './interfaces/dbml-parser.interface';
 
 import { getColumnFlags } from './helpers';
@@ -51,6 +52,10 @@ export class DbmlParserService {
     this.dbmlContent.set(content);
   }
 
+  /**
+   * Convert DBML content to JSON schema.
+   * Handles tables, columns, and relationships (including junction tables).
+   */
   private parseDbmlToJson(dbmlContent: string): DatabaseSchema {
     if (!dbmlContent.trim()) {
       return { tables: [], relations: [] };
@@ -109,12 +114,22 @@ export class DbmlParserService {
         continue;
       }
 
-      // Relationship definition (outside tables) - sintaxis global
       /*
+      // Relationship definition (outside tables) - sintaxis global
         e.g. regex
         Ref name_optional: schema1.table1.column1 < schema2.table2.column2
         Ref: books.id <> authors.id
         Ref books: books.id <> authors.id
+
+        relationMatch contains:
+          [0]: full match
+          [1]: optional reference name (it's the joint table name)
+          [2]: from table
+          [3]: from column
+          [4]: operator
+          [5]: to table
+          [6]: to column
+
       */
       const relationMatch = line.match(
         /Ref(?:\s+(\w+))?\s*:?\s*([\w_]+)\.([\w_]+)\s*([<>=]+)\s*([\w_]+)\.([\w_]+)/
@@ -122,6 +137,7 @@ export class DbmlParserService {
 
       if (relationMatch) {
         const relation = this.parseRelationshipLine(line);
+
         if (relation) {
           schema.relations.push(relation);
 
@@ -158,26 +174,117 @@ export class DbmlParserService {
 
   /*
     Detects if a junction table exists for many-to-many relations.
+    Only Many-to-Many relations are considered.
   */
   private detectJunctionTable(
     schema: DatabaseSchema,
     relation: Relation,
     junctionTableName: string
   ): void {
+    if (
+      relation.cardinality.from !== Cardinality.Many ||
+      relation.cardinality.to !== Cardinality.Many
+    ) {
+      return;
+    }
+
     // Search if junction table already exists
     const junctionTable = schema.tables.find(
       (t) => t.name === junctionTableName
     );
 
-    if (!junctionTable) {
-      // Create a suggested junction table
+    /*
+      Expected name is based on convention: e.g., table1.col <> table2.col
+      In case the junction table exists, we validate it has the expected foreign keys.
+      If it doesn't exist, we create it with the expected foreign keys.
+    */
+    const fromTable = schema.tables.find((t) => t.name === relation.from.table);
+    const toTable = schema.tables.find((t) => t.name === relation.to.table);
+
+    const fromColumn = fromTable?.columns.find(
+      (c) => c.name === relation.from.column
+    );
+    const toColumn = toTable?.columns.find(
+      (c) => c.name === relation.to.column
+    );
+
+    const expectedFromColumnName = `${relation.from.table}_${relation.from.column}`;
+    const expectedToColumnName = `${relation.to.table}_${relation.to.column}`;
+
+    if (junctionTable) {
+      // Table exists - validate and enhance it
+      let hasFromFK = false;
+      let hasToFK = false;
+
+      // Check if the expected foreign keys exist
+      for (const column of junctionTable.columns) {
+        // Check for FK to fromTable
+        if (
+          column.ref?.table === relation.from.table &&
+          column.ref?.column === relation.from.column
+        ) {
+          hasFromFK = true;
+          // Ensure it's marked as PK for composite key
+          if (!column.pk) {
+            column.pk = true;
+          }
+        }
+
+        // Check for FK to toTable
+        if (
+          column.ref?.table === relation.to.table &&
+          column.ref?.column === relation.to.column
+        ) {
+          hasToFK = true;
+          // Ensure it's marked as PK for composite key
+          if (!column.pk) {
+            column.pk = true;
+          }
+        }
+      }
+
+      // Add missing foreign keys if needed
+      if (!hasFromFK) {
+        junctionTable.columns.push({
+          name: expectedFromColumnName,
+          type: fromColumn?.type || 'int',
+          pk: true,
+          ref: {
+            table: relation.from.table,
+            column: relation.from.column,
+            cardinality: {
+              from: Cardinality.Many,
+              to: Cardinality.One,
+            },
+          },
+        });
+      }
+
+      if (!hasToFK) {
+        junctionTable.columns.push({
+          name: expectedToColumnName,
+          type: toColumn?.type || 'int',
+          pk: true,
+          ref: {
+            table: relation.to.table,
+            column: relation.to.column,
+            cardinality: {
+              from: Cardinality.Many,
+              to: Cardinality.One,
+            },
+          },
+        });
+      }
+    } else {
+      // Table doesn't exist - create it
       schema.tables.push({
         name: junctionTableName,
         alias: null,
         columns: [
           {
-            name: `${relation.from.table}_id`,
-            type: 'int',
+            name: expectedFromColumnName,
+            type: fromColumn?.type || 'int',
+            pk: true,
             ref: {
               table: relation.from.table,
               column: relation.from.column,
@@ -188,8 +295,9 @@ export class DbmlParserService {
             },
           },
           {
-            name: `${relation.to.table}_id`,
-            type: 'int',
+            name: expectedToColumnName,
+            type: toColumn?.type || 'int',
+            pk: true,
             ref: {
               table: relation.to.table,
               column: relation.to.column,
@@ -211,63 +319,61 @@ export class DbmlParserService {
 */
   private addMissingForeignKeyColumns(schema: DatabaseSchema): void {
     for (const relation of schema.relations) {
+      // Many-to-Many relations don't have foreign keys in either table, so we skip them
+      if (
+        relation.cardinality.from === Cardinality.Many &&
+        relation.cardinality.to === Cardinality.Many
+      ) {
+        continue;
+      }
+
       // Find the table that should have the foreign key column
-      const table = schema.tables.find((t) => t.name === relation.from.table);
-      if (!table) continue;
+      const fromTable = schema.tables.find(
+        (t) => t.name === relation.from.table
+      );
+      if (!fromTable) continue;
 
       // Check if the column already exists
-      const existingColumn = table.columns.find(
-        (col) => col.name === relation.from.column
+      const fromColumn = fromTable.columns.find(
+        (c) => c.name === relation.from.column
       );
 
-      if (existingColumn) {
-        // Column exists but might not have a reference
+      if (!fromColumn) {
+        // Column doesn't exist, create it with the reference
         // e.g.
         //    Table posts { user_id int }
         //    Ref: orders.user_id > users.id
-        if (!existingColumn.ref) {
-          // Add the reference to the existing column
-          existingColumn.ref = {
-            table: relation.to.table,
-            column: relation.to.column,
-            cardinality: relation.cardinality,
-          };
+
+        const toTable = schema.tables.find((t) => t.name === relation.to.table);
+        const toColumn = toTable?.columns.find(
+          (c) => c.name === relation.to.column
+        );
+
+        if (toColumn) {
+          fromTable.columns.push({
+            name: `${relation.to.table}_${relation.to.column}`,
+            type: toColumn.type,
+            ref: {
+              table: relation.to.table,
+              column: relation.to.column,
+              cardinality: relation.cardinality,
+            },
+          });
         }
-      } else {
-        // Column doesn't exist, create it with reference
-        // Determine the type based on the referenced column
-        // e.g.
-        //    Table orders {  } // no user_id column
-        //    Ref: orders.user_id > users.id
-        const referencedTable = schema.tables.find(
-          (t) => t.name === relation.to.table
-        );
-
-        const referencedColumn = referencedTable?.columns.find(
-          (col) => col.name === relation.to.column
-        );
-
-        const columnType = referencedColumn?.type || 'int';
-
-        // Create the foreign key column
-        const newColumn: Column = {
-          name: relation.from.column,
-          type: columnType,
-          ref: {
-            table: relation.to.table,
-            column: relation.to.column,
-            cardinality: relation.cardinality,
-          },
+      } else if (!fromColumn.ref) {
+        // Column exists but has no reference, add it
+        fromColumn.ref = {
+          table: relation.to.table,
+          column: relation.to.column,
+          cardinality: relation.cardinality,
         };
-
-        table.columns.push(newColumn);
       }
     }
   }
 
   private deduplicateRelations(schema: DatabaseSchema): DatabaseSchema {
     /*
-      If there are duplicate relations (same from and to), we remove them.
+      If there are duplicate relations (same "from" and "to"), we remove them.
     */
 
     const uniqueRelations = schema.relations.filter(
@@ -344,17 +450,7 @@ export class DbmlParserService {
     const [, direction, refTable, refColumn] = refMatch;
     const ref: ColumnRef = { table: refTable, column: refColumn };
 
-    const cardinalityMap: Record<
-      string,
-      { from: Cardinality; to: Cardinality }
-    > = {
-      '>': { from: Cardinality.Many, to: Cardinality.One },
-      '<': { from: Cardinality.One, to: Cardinality.Many },
-      '<>': { from: Cardinality.Many, to: Cardinality.Many },
-      '-': { from: Cardinality.One, to: Cardinality.One },
-    };
-
-    ref.cardinality = cardinalityMap[direction] ?? {
+    ref.cardinality = CARDINALITY_MAP[direction as RelationOperator] ?? {
       from: Cardinality.One,
       to: Cardinality.One,
     };
@@ -447,29 +543,8 @@ export class DbmlParserService {
     let cardinality: Relation['cardinality'] = DEFAULT_CARDINALITY;
 
     /* Operator defines the cardinality and direction */
-    switch (operator) {
-      case RelationOperator.OneToOne: // '='
-        cardinality = { from: Cardinality.One, to: Cardinality.One };
-        break;
-
-      case RelationOperator.OneToMany: // '<'
-        /* For '<', table1 has many table2 records (one-to-many from table1 perspective) */
-        cardinality = { from: Cardinality.One, to: Cardinality.Many };
-        break;
-
-      case RelationOperator.ManyToOne: // '>'
-        /* For '>', many table1 records point to one table2 record (many-to-one from table1 perspective) */
-        cardinality = { from: Cardinality.Many, to: Cardinality.One };
-        break;
-
-      case RelationOperator.ManyToMany: // '<>'
-        /* Many to many in both directions */
-        cardinality = { from: Cardinality.Many, to: Cardinality.Many };
-        break;
-
-      default:
-        return null;
-    }
+    cardinality =
+      CARDINALITY_MAP[operator as RelationOperator] ?? DEFAULT_CARDINALITY;
 
     /* By default, we return from table1 to table2 */
     return {
