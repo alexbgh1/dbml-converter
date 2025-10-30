@@ -6,6 +6,11 @@ export const JSON_FILE = {
   filename: 'schema.json',
 };
 
+export const PRISMA_SCHEMA_FILE = {
+  id: 'schema-prisma',
+  filename: 'schema.prisma',
+};
+
 export const DATABASE_FILE = {
   id: 'database-module',
   filename: 'database.module.ts',

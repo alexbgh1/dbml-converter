@@ -104,9 +104,14 @@ ${models}
   private mapToPrismaType(column: Column): string {
     const baseType = mapDbTypeToPrismaType(column.type);
 
+    // Handle special dates/timestamps with defaults
+    const hasDefault =
+      column.default !== undefined ||
+      CREATED_AT_FIELDS.includes(column.name.toLowerCase()) ||
+      UPDATED_AT_FIELDS.includes(column.name.toLowerCase());
+
     // Check if nullable
-    // Foreign keys should not be nullable by default
-    const isNullable = column.nullable !== false && !column.pk && !column.ref;
+    const isNullable = column.nullable === true && !hasDefault;
 
     return isNullable ? `${baseType}?` : baseType;
   }

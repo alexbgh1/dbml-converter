@@ -4,6 +4,7 @@ import {
   inject,
   effect,
   WritableSignal,
+  computed,
 } from '@angular/core';
 
 import { DbmlParserService } from '../dbml-parser/dbml-parser';
@@ -19,6 +20,7 @@ import {
   INPUT,
   JSON_FILE,
   OUTPUT,
+  PRISMA_SCHEMA_FILE,
 } from '../../components/dbml-converter/constants/dbml-in-out.constants';
 
 import { OutputOption } from '../../components/dbml-converter/interfaces/dbml-converter.interface';
@@ -46,6 +48,7 @@ export class DbmlStateService {
 
   // Computed states
   schema = this.dbmlParserService.schema;
+
   hasError = this.dbmlParserService.hasError;
   errorMessage = this.dbmlParserService.errorMessage;
 
@@ -53,6 +56,14 @@ export class DbmlStateService {
     entities: Record<string, string>;
     module: string;
   } | null>(null);
+
+  prismaSchema = computed(() => {
+    const schema = this.schema();
+    if (!schema) return null;
+
+    const prismaCode = this.prismaGeneratorService.generateCode(schema);
+    return prismaCode.schema;
+  });
 
   constructor() {
     effect(() => {

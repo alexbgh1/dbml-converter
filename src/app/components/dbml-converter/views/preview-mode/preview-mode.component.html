@@ -115,5 +115,30 @@
       }
     </div>
     }
+
+    <!-- Prisma ORM Output -->
+    @if (selectedOutputType() === OUTPUT_OPTIONS.prisma) {
+    <div class="py-6 px-6 relative">
+      <!-- Copy & Download buttons -->
+      <div class="absolute flex right-10 top-8 gap-2">
+        <copy-file-button
+          [textToCopy]="prismaSchema() ? this.formatJson(prismaSchema()) : ''"
+        ></copy-file-button>
+        <download-file-button
+          [textToDownload]="
+            prismaSchema() ? this.formatJson(prismaSchema()) : ''
+          "
+          [fileName]="'schema.prisma'"
+        ></download-file-button>
+      </div>
+
+      <!-- JSON Output -->
+      <app-code-viewer
+        [code]="prismaSchema() || ''"
+        [height]="'400px'"
+        language="prisma"
+      ></app-code-viewer>
+    </div>
+    }
   </div>
 </div>

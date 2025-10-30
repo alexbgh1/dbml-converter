@@ -14,7 +14,6 @@
 
 (function (Prism: any) {
   Prism.languages.prisma = {
-    // Comments
     comment: [
       {
         pattern: /\/\/\/.*$/m,
@@ -38,17 +37,9 @@
       greedy: true,
     },
 
-    entity: {
-      pattern: /\b(model|enum|type)\s+([A-Z][a-zA-Z0-9_]*)/,
-      lookbehind: true,
+    'class-name': {
+      pattern: /(?<=\b(?:model|enum|type)\s+)[A-Z][a-zA-Z0-9_]*/,
       greedy: true,
-      inside: {
-        keyword: /\b(model|enum|type)\b/,
-        'class-name': {
-          pattern: /[A-Z][a-zA-Z0-9_]*/,
-          alias: 'class-name',
-        },
-      },
     },
 
     decorator: {
@@ -111,7 +102,7 @@
     punctuation: /[{}(),:=]/,
 
     property: {
-      pattern: /\b[a-z_][a-zA-Z0-9_]*\b(?=\s+\w)/,
+      pattern: /\b[a-z_][a-zA-Z0-9_]*\b(?=\s+[A-Z])/,
       greedy: true,
     },
 

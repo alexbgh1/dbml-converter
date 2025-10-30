@@ -19,6 +19,7 @@ import { FileDropDownComponent } from '../../components/file-drop-down/file-drop
 
 import { CopyFileButtonComponent } from '../../../../shared/components/copy-file-button/copy-file-button.component';
 import { DownloadFileButtonComponent } from '../../../../shared/components/download-file-button/download-file-button.component';
+import { PRISMA_SCHEMA_FILE } from '../../constants/dbml-in-out.constants';
 
 @Component({
   selector: 'app-preview-mode',
@@ -44,6 +45,8 @@ export class PreviewModeComponent {
   dbmlContent = this.stateService.dbmlContent;
   schema = this.stateService.schema;
   nestjsCode = this.stateService.nestjsCode;
+  prismaSchema = this.stateService.prismaSchema;
+
   isConverting = this.stateService.isConverting;
   selectedOutputType = this.stateService.selectedOutputType;
 
