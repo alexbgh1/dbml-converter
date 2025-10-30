@@ -5,6 +5,7 @@ import * as Prism from 'prismjs';
 Load languages beforehand to ensure they are registered in Prism
 */
 import './custom-languages/dbml-prism.constant';
+import './custom-languages/prisma.constant';
 import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-typescript';
 import 'prismjs/components/prism-javascript';

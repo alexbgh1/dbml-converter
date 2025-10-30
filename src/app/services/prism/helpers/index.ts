@@ -60,7 +60,7 @@ export function getLanguageFromFilename(filename: string): string {
       return 'bash';
     // Custom cases: prisma & dbml languages
     case 'prisma':
-      return 'javascript';
+      return 'prisma';
     case 'dbml':
       return 'dbml';
     default:
