@@ -1,5 +1,4 @@
-// mappers/ts-type.mapper.ts
-import { DATA_TYPES } from '../../../dbml-parser/constants';
+import { DATA_TYPES } from '../../dbml-parser/constants';
 
 export function mapDbTypeToTsType(dbType: string): string {
   const type = dbType.toLowerCase();

@@ -21,13 +21,14 @@ export const DEFAULT_CARDINALITY = {
   to: Cardinality.One,
 };
 
-//   if (type.includes('int')) return 'int';
-// if (type.includes('varchar') || type.includes('char')) return 'varchar';
-// if (type.includes('text')) return 'text';
-// if (type.includes('date')) return 'date';
-// if (type.includes('time') && type.includes('stamp')) return 'timestamp';
-// if (type.includes('time')) return 'time';
-// if (type.includes('bool')) return 'boolean';
-// if (type.includes('float') || type.includes('double')) return 'float';
-// if (type.includes('decimal')) return 'decimal';
-// if (type.includes('json')) return 'json';
+/*
+  Special handle col names for better default value mapping
+*/
+export const CREATED_AT_FIELDS = ['created_at', 'createdat', 'creation_date'];
+export const UPDATED_AT_FIELDS = [
+  'updated_at',
+  'updatedat',
+  'modification_date',
+];
+export const DELETED_AT_FIELDS = ['deleted_at', 'deletedat', 'deletion_date'];
+export const TIME_FIELD = ['time', 'timestamp', 'timestamptz', 'datetime'];

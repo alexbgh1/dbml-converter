@@ -1,4 +1,4 @@
-import { DATA_TYPES } from '../../../dbml-parser/constants';
+import { DATA_TYPES } from '../../dbml-parser/constants';
 
 export function mapDbTypeToTypeOrmType(dbType: string): string {
   const type = dbType.toLowerCase();

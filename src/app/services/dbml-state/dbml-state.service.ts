@@ -8,6 +8,7 @@ import {
 
 import { DbmlParserService } from '../dbml-parser/dbml-parser';
 import { NestjsGeneratorService } from '../output-generators/nestjs-generator/nestjs-generator.service';
+import { PrismaGeneratorService } from '../output-generators/prisma-generator/prisma-generator.service';
 
 import {
   OUTPUT_OPTIONS_MAP,
@@ -29,6 +30,7 @@ import { formatJson } from '../../components/dbml-converter/helpers';
 export class DbmlStateService {
   private dbmlParserService = inject(DbmlParserService);
   private nestjsGeneratorService = inject(NestjsGeneratorService);
+  private prismaGeneratorService = inject(PrismaGeneratorService);
 
   // Shared state across routes
   dbmlContent: WritableSignal<string> = signal<string>('');
@@ -143,6 +145,15 @@ export class DbmlStateService {
                 });
               }
             }
+            break;
+
+          case OUTPUT_OPTIONS_MAP.prisma:
+            const prismaCode = this.prismaGeneratorService.generateCode(schema);
+            generatedFiles.push({
+              id: 'schema-prisma',
+              filename: 'schema.prisma',
+              content: prismaCode.schema,
+            });
             break;
         }
 

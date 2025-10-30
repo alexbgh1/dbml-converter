@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core';
 
-import { mapDbTypeToTypeOrmType } from './mappers/typeorm.mapper';
-import { mapDbTypeToTsType } from './mappers/ts.mapper';
+import { mapDbTypeToTypeOrmType } from '../mappers/typeorm.mapper';
+import { mapDbTypeToTsType } from '../mappers/ts.mapper';
+
+import {
+  CREATED_AT_FIELDS,
+  DELETED_AT_FIELDS,
+  TIME_FIELD,
+  UPDATED_AT_FIELDS,
+} from '../../dbml-parser/constants';
 
 import {
   DatabaseSchema,
@@ -9,7 +16,6 @@ import {
   Column,
   Cardinality,
 } from '../../dbml-parser/interfaces/dbml-parser.interface';
-
 import {
   GeneratedCode,
   CodeGenerationOptions,
@@ -256,9 +262,12 @@ export class ${className} {
       // Add special timestamp decorators
       if (this.isTimestampColumn(column)) {
         const columnName = column.name.toLowerCase();
-        if (columnName === 'created_at') imports.add('CreateDateColumn');
-        if (columnName === 'updated_at') imports.add('UpdateDateColumn');
-        if (columnName === 'deleted_at') imports.add('DeleteDateColumn');
+        if (CREATED_AT_FIELDS.includes(columnName))
+          imports.add('CreateDateColumn');
+        if (UPDATED_AT_FIELDS.includes(columnName))
+          imports.add('UpdateDateColumn');
+        if (DELETED_AT_FIELDS.includes(columnName))
+          imports.add('DeleteDateColumn');
       }
     }
 
@@ -380,12 +389,11 @@ export class ${className} {
   Check if column is a special timestamp column (created_at, updated_at)
   */
   private isTimestampColumn(column: Column): boolean {
-    const isTimestampType = ['timestamp', 'timestamptz', 'datetime'].includes(
-      column.type.toLowerCase()
-    );
-    const isSpecialName = ['created_at', 'updated_at', 'deleted_at'].includes(
-      column.name.toLowerCase()
-    );
+    const isTimestampType = TIME_FIELD.includes(column.type.toLowerCase());
+    const isSpecialName = CREATED_AT_FIELDS.concat(
+      DELETED_AT_FIELDS,
+      UPDATED_AT_FIELDS
+    ).includes(column.name.toLowerCase());
     return isTimestampType && isSpecialName;
   }
 
@@ -398,15 +406,15 @@ export class ${className} {
     const columnName = column.name.toLowerCase();
     const tsType = mapDbTypeToTsType(column.type);
 
-    if (columnName === 'created_at') {
+    if (CREATED_AT_FIELDS.includes(columnName)) {
       return `${comment}@CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })\n  ${column.name}: ${tsType};`;
     }
 
-    if (columnName === 'updated_at') {
+    if (UPDATED_AT_FIELDS.includes(columnName)) {
       return `${comment}@UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })\n  ${column.name}: ${tsType};`;
     }
 
-    if (columnName === 'deleted_at') {
+    if (DELETED_AT_FIELDS.includes(columnName)) {
       return `${comment}@DeleteDateColumn({ type: 'timestamptz', nullable: true })\n  ${column.name}: ${tsType};`;
     }
 
