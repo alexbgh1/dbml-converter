@@ -7,7 +7,7 @@ const OUTPUT_OPTIONS_MAP: Record<OutputOption, OutputOption> = {
   json: 'json',
   typeorm: 'typeorm',
   prisma: 'prisma',
-};
+} as const;
 
 const OUTPUT_OPTIONS_ARRAY = Object.values(OUTPUT_OPTIONS_MAP);
 

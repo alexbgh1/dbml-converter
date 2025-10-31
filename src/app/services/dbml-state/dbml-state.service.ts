@@ -26,6 +26,7 @@ import { OutputOption } from '../../components/dbml-converter/interfaces/dbml-co
 import { EditorFile } from '../../components/dbml-converter/interfaces/editor.interface';
 
 import { formatJson } from '../../components/dbml-converter/helpers';
+import { STORAGE_KEYS } from './constants/local-storage.constants';
 
 @Injectable({ providedIn: 'root' })
 export class DbmlStateService {
@@ -33,10 +34,26 @@ export class DbmlStateService {
   private nestjsGeneratorService = inject(NestjsGeneratorService);
   private prismaGeneratorService = inject(PrismaGeneratorService);
 
+  constructor() {
+    /* Save DBML content and output type to localStorage on changes */
+    effect(() => {
+      const content = this.dbmlContent();
+      this.saveToStorage(STORAGE_KEYS.DBML_CONTENT, content);
+    });
+
+    effect(() => {
+      const outputType = this.selectedOutputType();
+      this.saveToStorage(STORAGE_KEYS.OUTPUT_TYPE, outputType);
+    });
+  }
+
   // Shared state across routes
-  dbmlContent: WritableSignal<string> = signal<string>('');
+  dbmlContent: WritableSignal<string> = signal<string>(
+    this.loadFromStorage(STORAGE_KEYS.DBML_CONTENT) || ''
+  );
+
   selectedOutputType: WritableSignal<OutputOption> = signal<OutputOption>(
-    OUTPUT_OPTIONS_MAP.json
+    this.loadOutputTypeFromStorage() || OUTPUT_OPTIONS_MAP.json
   );
   isConverting: WritableSignal<boolean> = signal<boolean>(false);
 
@@ -171,5 +188,40 @@ export class DbmlStateService {
    */
   onDbmlInput(code: string): void {
     this.dbmlContent.set(code);
+  }
+
+  private saveToStorage(key: string, value: any): void {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
+  }
+
+  private loadFromStorage(key: string): string | null {
+    try {
+      const item = localStorage.getItem(key);
+      return item ? JSON.parse(item) : null;
+    } catch (error) {
+      console.error('Error loading from localStorage:', error);
+      return null;
+    }
+  }
+
+  private loadOutputTypeFromStorage(): OutputOption | null {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.OUTPUT_TYPE);
+      if (!saved) return null;
+
+      const outputTypeId = JSON.parse(saved) as OutputOption;
+
+      // ✅ Validar que existe en OUTPUT_OPTIONS
+      return Object.values(OUTPUT_OPTIONS_MAP).includes(outputTypeId)
+        ? outputTypeId
+        : null;
+    } catch (error) {
+      console.error('Error loading output type from localStorage:', error);
+      return null;
+    }
   }
 }
