@@ -1,25 +1,28 @@
 import { Component, inject, computed } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { DbmlStateService } from '../../../../services/dbml-state/dbml-state.service';
+import { DbmlStateService } from '../../services/dbml-state/dbml-state.service';
 
-import { DBML_DEFAULT_EXAMPLE, DBML_DEFAULT_VALUE } from '../../constants';
+import {
+  DBML_DEFAULT_EXAMPLE,
+  DBML_DEFAULT_VALUE,
+} from '../../components/dbml-converter/constants';
 import {
   OUTPUT_OPTIONS_MAP,
   OUTPUT_TYPES,
-} from '../../constants/dbml-converter.constants';
+} from '../../components/dbml-converter/constants/dbml-converter.constants';
 
-import { CodeCharsPipe } from '../../../../shared/pipes/code-chars-count';
-import { formatJson } from '../../helpers';
+import { CodeCharsPipe } from '../../shared/pipes/code-chars-count';
+import { formatJson } from '../../components/dbml-converter/helpers';
 
-import { DbmlCodeEditorComponent } from '../../components/dbml-code-editor/dbml-code-editor.component';
-import { CodeViewerComponent } from '../../../code-viewer/code-viewer.component';
-import { ExpandingCircleButtonComponent } from '../../../../shared/components/expanding-circle-button/expanding-circle-button.component';
-import { FileDropDownComponent } from '../../components/file-drop-down/file-drop-down.component';
+import { DbmlCodeEditorComponent } from '../../components/dbml-converter/components/dbml-code-editor/dbml-code-editor.component';
+import { CodeViewerComponent } from '../../components/code-viewer/code-viewer.component';
+import { ExpandingCircleButtonComponent } from '../../shared/components/expanding-circle-button/expanding-circle-button.component';
+import { FileDropDownComponent } from '../../components/dbml-converter/components/file-drop-down/file-drop-down.component';
 
-import { CopyFileButtonComponent } from '../../../../shared/components/copy-file-button/copy-file-button.component';
-import { DownloadFileButtonComponent } from '../../../../shared/components/download-file-button/download-file-button.component';
-import { PRISMA_SCHEMA_FILE } from '../../constants/dbml-in-out.constants';
+import { CopyFileButtonComponent } from '../../shared/components/copy-file-button/copy-file-button.component';
+import { DownloadFileButtonComponent } from '../../shared/components/download-file-button/download-file-button.component';
+import { PRISMA_SCHEMA_FILE } from '../../components/dbml-converter/constants/dbml-in-out.constants';
 
 @Component({
   selector: 'app-preview-mode',

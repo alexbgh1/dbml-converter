@@ -21,16 +21,16 @@ export const routes: Routes = [
       {
         path: 'preview-mode',
         loadComponent: () =>
-          import(
-            './components/dbml-converter/views/preview-mode/preview-mode.component'
-          ).then((m) => m.PreviewModeComponent),
+          import('./pages/preview-mode/preview-mode.component').then(
+            (m) => m.PreviewModeComponent
+          ),
       },
       {
         path: 'editor-mode',
         loadComponent: () =>
-          import(
-            './components/dbml-converter/views/editor-mode/editor-mode.component'
-          ).then((m) => m.EditorModeComponent),
+          import('./pages/editor-mode/editor-mode.component').then(
+            (m) => m.EditorModeComponent
+          ),
       },
     ],
   },
