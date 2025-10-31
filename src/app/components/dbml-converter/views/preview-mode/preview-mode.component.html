@@ -122,12 +122,10 @@
       <!-- Copy & Download buttons -->
       <div class="absolute flex right-10 top-8 gap-2">
         <copy-file-button
-          [textToCopy]="prismaSchema() ? this.formatJson(prismaSchema()) : ''"
+          [textToCopy]="prismaSchema() || ''"
         ></copy-file-button>
         <download-file-button
-          [textToDownload]="
-            prismaSchema() ? this.formatJson(prismaSchema()) : ''
-          "
+          [textToDownload]="prismaSchema() || ''"
           [fileName]="'schema.prisma'"
         ></download-file-button>
       </div>
