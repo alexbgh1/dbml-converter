@@ -53,9 +53,6 @@ export class PreviewModeComponent {
   isConverting = this.stateService.isConverting;
   selectedOutputType = this.stateService.selectedOutputType;
 
-  hasError = this.stateService.hasError;
-  errorMessage = this.stateService.errorMessage;
-
   // Constants
   OUTPUT_OPTIONS = OUTPUT_OPTIONS_MAP;
   DBML_DEFAULT_VALUE = DBML_DEFAULT_VALUE;

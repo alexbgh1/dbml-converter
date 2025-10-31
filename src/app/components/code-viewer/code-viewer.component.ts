@@ -47,17 +47,6 @@ export class CodeViewerComponent implements OnChanges {
         ? this.language
         : this.DEFAULT_PRISM_LANGUAGE;
 
-    try {
-      this.highlightedCode = this.prismService.highlight(this.code, language);
-    } catch (error) {
-      console.error(
-        `Error highlighting code with language ${language}:`,
-        error
-      );
-      this.highlightedCode = this.code
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-    }
+    this.highlightedCode = this.prismService.highlight(this.code, language);
   }
 }

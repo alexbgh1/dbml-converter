@@ -23,28 +23,15 @@ import { DEFAULT_CARDINALITY } from './constants';
 @Injectable({ providedIn: 'root' })
 export class DbmlParserService {
   private dbmlContent: WritableSignal<string> = signal<string>('');
-  private parsingError: WritableSignal<string | null> = signal<string | null>(
-    null
-  );
   private parsedSchema: WritableSignal<DatabaseSchema | null> =
     signal<DatabaseSchema | null>(null);
 
   readonly schema = computed(() => this.parsedSchema());
-  readonly hasError = computed(() => this.parsingError() !== null);
-  readonly errorMessage = computed(() => this.parsingError());
 
   constructor() {
     effect(() => {
       const content = this.dbmlContent();
-      try {
-        this.parsingError.set(null);
-        this.parsedSchema.set(this.parseDbmlToJson(content));
-      } catch (error) {
-        this.parsingError.set(
-          error instanceof Error ? error.message : 'Unknown parsing error'
-        );
-        this.parsedSchema.set(null);
-      }
+      this.parsedSchema.set(this.parseDbmlToJson(content));
     });
   }
 

@@ -20,7 +20,6 @@ import {
   INPUT,
   JSON_FILE,
   OUTPUT,
-  PRISMA_SCHEMA_FILE,
 } from '../../components/dbml-converter/constants/dbml-in-out.constants';
 
 import { OutputOption } from '../../components/dbml-converter/interfaces/dbml-converter.interface';
@@ -49,13 +48,12 @@ export class DbmlStateService {
   // Computed states
   schema = this.dbmlParserService.schema;
 
-  hasError = this.dbmlParserService.hasError;
-  errorMessage = this.dbmlParserService.errorMessage;
+  nestjsCode = computed(() => {
+    const schema = this.schema();
+    if (!schema) return null;
 
-  nestjsCode = signal<{
-    entities: Record<string, string>;
-    module: string;
-  } | null>(null);
+    return this.nestjsGeneratorService.generateCode(schema);
+  });
 
   prismaSchema = computed(() => {
     const schema = this.schema();
@@ -64,18 +62,6 @@ export class DbmlStateService {
     const prismaCode = this.prismaGeneratorService.generateCode(schema);
     return prismaCode.schema;
   });
-
-  constructor() {
-    effect(() => {
-      const type = this.selectedOutputType();
-      const schema = this.schema();
-      const hasError = this.hasError();
-
-      if (!hasError && schema && type === OUTPUT_OPTIONS_MAP.typeorm) {
-        this.generateNestjsCode();
-      }
-    });
-  }
 
   // Actions
   setDbmlContent(content: string): void {
@@ -97,11 +83,6 @@ export class DbmlStateService {
     if (this.selectedOutputType() === typeId) return;
 
     this.selectedOutputType.set(type.id);
-
-    // If changing to a type other than NestJS or TypeORM, clear the generated code
-    if (typeId !== OUTPUT_OPTIONS_MAP.typeorm) {
-      this.nestjsCode.set(null);
-    }
   }
 
   handleConvert() {
@@ -110,77 +91,71 @@ export class DbmlStateService {
     this.dbmlParserService.setDbmlContent(this.dbmlContent());
 
     setTimeout(() => {
-      try {
-        const schema = this.schema();
-        const hasError = this.hasError();
+      const schema = this.schema();
 
-        if (hasError || !schema) {
-          this.isConverting.set(false);
-          return;
-        }
+      if (!schema) {
+        this.isConverting.set(false);
+        return;
+      }
 
-        const outputType = this.selectedOutputType();
-        const generatedFiles: EditorFile[] = [];
+      const outputType = this.selectedOutputType();
+      const generatedFiles: EditorFile[] = [];
 
-        switch (outputType) {
-          case OUTPUT_OPTIONS_MAP.json:
-            generatedFiles.push({
-              id: JSON_FILE.id,
-              filename: JSON_FILE.filename,
-              content: formatJson(schema),
-            });
-            break;
+      switch (outputType) {
+        case OUTPUT_OPTIONS_MAP.json:
+          generatedFiles.push({
+            id: JSON_FILE.id,
+            filename: JSON_FILE.filename,
+            content: formatJson(schema),
+          });
+          break;
 
-          case OUTPUT_OPTIONS_MAP.typeorm:
-            this.generateNestjsCode();
-            const nestjsCode = this.nestjsCode();
+        case OUTPUT_OPTIONS_MAP.typeorm:
+          const nestjsCode = this.nestjsCode();
 
-            if (nestjsCode) {
-              // Add entities files (e.g., User.ts, Post.ts, etc.)
-              Object.entries(nestjsCode.entities).forEach(
-                ([filename, content]) => {
-                  generatedFiles.push({
-                    id: `entity-${filename}`,
-                    filename: filename,
-                    content,
-                  });
-                }
-              );
-
-              // Add module file (e.g., database.module.ts)
-              if (outputType === OUTPUT_OPTIONS_MAP.typeorm) {
+          if (nestjsCode) {
+            // Add entities files (e.g., User.ts, Post.ts, etc.)
+            Object.entries(nestjsCode.entities).forEach(
+              ([filename, content]) => {
                 generatedFiles.push({
-                  id: DATABASE_FILE.id,
-                  filename: DATABASE_FILE.filename,
-                  content: nestjsCode.module,
+                  id: `entity-${filename}`,
+                  filename: filename,
+                  content,
                 });
               }
+            );
+
+            // Add module file (e.g., database.module.ts)
+            if (outputType === OUTPUT_OPTIONS_MAP.typeorm) {
+              generatedFiles.push({
+                id: DATABASE_FILE.id,
+                filename: DATABASE_FILE.filename,
+                content: nestjsCode.module,
+              });
             }
-            break;
+          }
+          break;
 
-          case OUTPUT_OPTIONS_MAP.prisma:
-            const prismaCode = this.prismaGeneratorService.generateCode(schema);
-            generatedFiles.push({
-              id: 'schema-prisma',
-              filename: 'schema.prisma',
-              content: prismaCode.schema,
-            });
-            break;
-        }
-
-        // Update state with generated files
-        this.files.set(generatedFiles);
-
-        // Open folders automatically
-        const expandedFolders = new Set(this.expandedFolders());
-        expandedFolders.add(INPUT);
-        expandedFolders.add(OUTPUT);
-        this.expandedFolders.set(expandedFolders);
-      } catch (error) {
-        console.error('Error during conversion:', error);
-      } finally {
-        this.isConverting.set(false);
+        case OUTPUT_OPTIONS_MAP.prisma:
+          const prismaCode = this.prismaGeneratorService.generateCode(schema);
+          generatedFiles.push({
+            id: 'schema-prisma',
+            filename: 'schema.prisma',
+            content: prismaCode.schema,
+          });
+          break;
       }
+
+      // Update state with generated files
+      this.files.set(generatedFiles);
+
+      // Open folders automatically
+      const expandedFolders = new Set(this.expandedFolders());
+      expandedFolders.add(INPUT);
+      expandedFolders.add(OUTPUT);
+      this.expandedFolders.set(expandedFolders);
+
+      this.isConverting.set(false);
     }, 100);
   }
 
@@ -189,17 +164,6 @@ export class DbmlStateService {
     this.input.set('');
     this.files.set([]);
     this.selectedFile.set(null);
-  }
-
-  /**
-   * Generate NestJS code from the schema
-   */
-  private generateNestjsCode(): void {
-    const schema = this.schema();
-    if (!schema) return;
-
-    const generatedCode = this.nestjsGeneratorService.generateCode(schema);
-    this.nestjsCode.set(generatedCode);
   }
 
   /**

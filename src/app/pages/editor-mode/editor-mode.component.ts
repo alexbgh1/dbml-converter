@@ -64,8 +64,6 @@ export class EditorModeComponent {
   expandedFolders = this.stateService.expandedFolders;
   isConverting = this.stateService.isConverting;
 
-  hasError = this.stateService.hasError;
-  errorMessage = this.stateService.errorMessage;
   selectedOutputType = this.stateService.selectedOutputType;
 
   // Constants
