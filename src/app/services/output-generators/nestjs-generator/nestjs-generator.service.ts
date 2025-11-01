@@ -173,7 +173,10 @@ export class ${className} {
       const relationOptions = opts.length ? `, { ${opts.join(', ')} }` : '';
 
       // Detect if this is a OneToOne relationship (FK is unique)
-      const isOneToOne = column.unique;
+      const isOneToOne =
+        column.unique ||
+        (column.ref.cardinality?.from === Cardinality.One &&
+          column.ref.cardinality?.to === Cardinality.One);
 
       if (isOneToOne) {
         // OneToOne relationship
@@ -356,7 +359,10 @@ export class ${className} {
         const inverseProperty = this.getCamelCase(currentClassName);
 
         // Detect if this is a OneToOne relationship (FK is unique)
-        const isOneToOne = fk.unique;
+        const isOneToOne =
+          fk.unique ||
+          (fk.ref?.cardinality?.from === Cardinality.One &&
+            fk.ref?.cardinality?.to === Cardinality.One);
 
         if (isOneToOne) {
           // OneToOne relationship (without @JoinColumn on this side)

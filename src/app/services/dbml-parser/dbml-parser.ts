@@ -117,10 +117,13 @@ export class DbmlParserService {
           [5]: to table
           [6]: to column
 
+          Symbols : <, >, <>, -
       */
       const relationMatch = line.match(
-        /Ref(?:\s+(\w+))?\s*:?\s*([\w_]+)\.([\w_]+)\s*([<>=]+)\s*([\w_]+)\.([\w_]+)/
+        /Ref(?:\s+(\w+))?\s*:?\s*([\w_]+)\.([\w_]+)\s*([<>-]+)\s*([\w_]+)\.([\w_]+)/
       );
+
+      console.log('relationMatch:', relationMatch);
 
       if (relationMatch) {
         const relation = this.parseRelationshipLine(line);
@@ -521,7 +524,7 @@ export class DbmlParserService {
     */
 
     const relationMatch = line.match(
-      /Ref(?:\s+(\w+))?\s*:?\s*([\w_]+)\.([\w_]+)\s*([<>=]+)\s*([\w_]+)\.([\w_]+)/
+      /Ref(?:\s+(\w+))?\s*:?\s*([\w_]+)\.([\w_]+)\s*([<>-]+)\s*([\w_]+)\.([\w_]+)/
     );
     if (!relationMatch) return null;
 

@@ -13,7 +13,7 @@ export enum Cardinality {
 }
 
 export enum RelationOperator {
-  OneToOne = '=',
+  OneToOne = '-',
   OneToMany = '<',
   ManyToOne = '>',
   ManyToMany = '<>',
