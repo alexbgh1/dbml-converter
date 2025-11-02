@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "dbdiagram-converter": {
+    "dbml-converter": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/dbdiagram-converter",
+            "outputPath": "dist/dbml-converter",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": ["zone.js"],
@@ -56,10 +56,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "dbdiagram-converter:build:production"
+              "buildTarget": "dbml-converter:build:production"
             },
             "development": {
-              "buildTarget": "dbdiagram-converter:build:development"
+              "buildTarget": "dbml-converter:build:development"
             }
           },
           "defaultConfiguration": "development"
