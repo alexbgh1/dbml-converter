@@ -20,6 +20,7 @@ import {
   INPUT,
   JSON_FILE,
   OUTPUT,
+  PRISMA_SCHEMA_FILE,
 } from '../../components/dbml-converter/constants/dbml-in-out.constants';
 
 import { OutputOption } from '../../components/dbml-converter/interfaces/dbml-converter.interface';
@@ -156,8 +157,8 @@ export class DbmlStateService {
         case OUTPUT_OPTIONS_MAP.prisma:
           const prismaCode = this.prismaGeneratorService.generateCode(schema);
           generatedFiles.push({
-            id: 'schema-prisma',
-            filename: 'schema.prisma',
+            id: PRISMA_SCHEMA_FILE.id,
+            filename: PRISMA_SCHEMA_FILE.filename,
             content: prismaCode.schema,
           });
           break;

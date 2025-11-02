@@ -53,6 +53,7 @@ import { DownloadFileButtonComponent } from '../../shared/components/download-fi
     CodeCharsPipe,
   ],
   templateUrl: './editor-mode.component.html',
+  host: { class: 'flex-1' },
 })
 export class EditorModeComponent {
   private stateService = inject(DbmlStateService);

@@ -22,7 +22,6 @@ import { FileDropDownComponent } from '../../components/dbml-converter/component
 
 import { CopyFileButtonComponent } from '../../shared/components/copy-file-button/copy-file-button.component';
 import { DownloadFileButtonComponent } from '../../shared/components/download-file-button/download-file-button.component';
-import { PRISMA_SCHEMA_FILE } from '../../components/dbml-converter/constants/dbml-in-out.constants';
 
 @Component({
   selector: 'app-preview-mode',
@@ -40,6 +39,7 @@ import { PRISMA_SCHEMA_FILE } from '../../components/dbml-converter/constants/db
     CodeCharsPipe,
   ],
   templateUrl: './preview-mode.component.html',
+  host: { class: 'flex-1' },
 })
 export class PreviewModeComponent {
   private stateService = inject(DbmlStateService);

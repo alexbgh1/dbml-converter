@@ -1,0 +1,23 @@
+<footer
+  class="py-4 text-center text-sm text-text-muted flex items-center justify-center"
+  [class]="isHomePage() ? 'bg-black/60' : ''"
+>
+  <a
+    class="relative group hover:text-white transition-colors"
+    href="https://github.com/alexbgh1/dbml-converter"
+    target="_blank"
+  >
+    <div
+      class="absolute top-1.5 left-1.5 w-2 h-2 bg-white rounded-full blur-sm opacity-20 group-hover:opacity-75 transition-opacity"
+    ></div>
+    <img
+      width="32"
+      height="32"
+      src="images/github-logo.png"
+      alt="DBML Icon"
+      class="relative inline-block w-6 h-6 invert"
+    />
+
+    <p class="inline-block ml-2">DBML Converter</p>
+  </a>
+</footer>
