@@ -34,4 +34,10 @@ export const routes: Routes = [
       },
     ],
   },
+
+  /* Redirect to home page in any other case */
+  {
+    path: '**',
+    redirectTo: '',
+  },
 ];
