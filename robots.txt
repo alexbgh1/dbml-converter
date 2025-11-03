@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://alexbgh1.github.io/dbml-converter/sitemap.xml
+Sitemap: sitemap.xml
