@@ -1,5 +1,7 @@
 import { Component, inject, computed } from '@angular/core';
 import { Router } from '@angular/router';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 import { DbmlStateService } from '../../services/dbml-state/dbml-state.service';
 
@@ -111,6 +113,30 @@ export class EditorModeComponent {
 
   selectFileInEditor(file: EditorFile | null): void {
     this.stateService.selectedFile.set(file);
+  }
+
+  async handleDownloadAllAsZip(): Promise<void> {
+    const inputFileLength = 1;
+    const confirmed = window.confirm(
+      `Downloading all files (${
+        this.files().length + inputFileLength
+      }) including input as a zip`
+    );
+    if (!confirmed) return;
+
+    const zip = new JSZip();
+
+    for (const file of this.files()) {
+      const filename = file.filename || `untitled.${file.id || 'txt'}`;
+      const content = file.content || '';
+      zip.file(filename, content);
+    }
+
+    // Add input file
+    zip.file('input.dbml', this.dbmlContent() || '');
+
+    const blob = await zip.generateAsync({ type: 'blob' });
+    saveAs(blob, 'dbml-project.zip');
   }
 
   handleLoadExample() {

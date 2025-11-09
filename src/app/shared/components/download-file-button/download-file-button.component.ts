@@ -1,4 +1,6 @@
 import { Component, Input } from '@angular/core';
+import { saveAs } from 'file-saver';
+
 import { DownloadIconComponent } from '../icons';
 import {
   DEFAULT_MIME_TYPE,
@@ -21,16 +23,9 @@ export class DownloadFileButtonComponent {
     event.stopPropagation();
 
     const mimeType = this.getMimeType(this.fileName);
-    const blob = new Blob([this.textToDownload], {
-      type: mimeType,
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = this.fileName;
-    a.click();
-    URL.revokeObjectURL(url);
-    a.remove();
+    const blob = new Blob([this.textToDownload], { type: mimeType });
+
+    saveAs(blob, this.fileName);
   }
 
   private getMimeType(fileName: string): string {
