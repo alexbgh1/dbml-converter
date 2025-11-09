@@ -98,7 +98,9 @@ ${models}
       isJunctionTable
     );
 
-    return `${fieldName} ${fieldType}${attributes}`;
+    const comment = column.note ? `/// ${column.note}\n  ` : '';
+
+    return `${comment}${fieldName} ${fieldType}${attributes}`;
   }
 
   private mapToPrismaType(column: Column): string {
