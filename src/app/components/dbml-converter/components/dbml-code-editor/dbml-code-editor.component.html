@@ -1,7 +1,7 @@
 <div
   #editorContainer
   class="editor-container editor-font border bg-bg-secondary border-border-muted rounded-sm"
-  [style.height]="height"
+  [style.height]="height()"
 >
   <!--
   Text area pl-12 comes from
@@ -11,13 +11,10 @@
   <textarea
     #editorTextarea
     [(ngModel)]="code"
-    (input)="onCodeChange()"
     (keydown)="onKeyDown($event)"
-    (scroll)="handleScroll($event)"
-    (mouseup)="onSelectionChange()"
-    (select)="onSelectionChange()"
+    (scroll)="handleScroll()"
     class="editor-input py-4 m-0 w-full h-full pl-12"
-    [placeholder]="placeholder"
+    [placeholder]="placeholder()"
     spellcheck="false"
     wrap="off"
   ></textarea>

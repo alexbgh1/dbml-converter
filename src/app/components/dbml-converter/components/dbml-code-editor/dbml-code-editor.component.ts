@@ -1,17 +1,13 @@
 import {
   Component,
   ElementRef,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  AfterViewInit,
   viewChild,
   signal,
   effect,
   WritableSignal,
   computed,
+  input,
+  model,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -34,21 +30,16 @@ import { CodeLine } from '../../interfaces/editor.interface';
   templateUrl: './dbml-code-editor.component.html',
   styleUrls: ['./dbml-code-editor.component.css'],
 })
-export class DbmlCodeEditorComponent implements OnChanges, AfterViewInit {
-  @Input() code: string = DBML_DEFAULT_VALUE;
-  @Input() placeholder: string = DBML_DEFAULT_VALUE;
-  @Input() height: string = '400px';
-  @Output() codeChange = new EventEmitter<string>();
+export class DbmlCodeEditorComponent {
+  code = model(DBML_DEFAULT_VALUE);
+  placeholder = input(DBML_DEFAULT_VALUE);
+  height = input('400px');
 
   editorTextarea = viewChild<ElementRef<HTMLTextAreaElement>>('editorTextarea');
-  highlightWrapper = viewChild<ElementRef<HTMLDivElement>>('highlightWrapper');
-  outputElement = viewChild<ElementRef<HTMLPreElement>>('outputElement');
-  editorContainer = viewChild<ElementRef<HTMLDivElement>>('editorContainer');
 
   highlighted: WritableSignal<string> = signal('');
   scrollTop: WritableSignal<number> = signal(0);
   scrollLeft: WritableSignal<number> = signal(0);
-  private isScrolling: WritableSignal<boolean> = signal(false);
 
   codeLines = computed<CodeLine[]>(() => {
     const lines = this.highlighted().split('\n');
@@ -58,117 +49,54 @@ export class DbmlCodeEditorComponent implements OnChanges, AfterViewInit {
     }));
   });
 
-  ngAfterViewInit(): void {
-    this.syncHighlighting();
-  }
-
-  handleScroll(event: Event): void {
-    const textarea = event.target as HTMLTextAreaElement;
-    this.scrollTop.set(textarea.scrollTop);
-    this.scrollLeft.set(textarea.scrollLeft);
-    this.syncHighlighting();
-  }
-
-  onCodeChange(): void {
-    this.highlightCode();
-    this.codeChange.emit(this.code);
-
-    requestAnimationFrame(() => this.syncHighlighting());
-  }
-
-  private syncHighlighting(): void {
-    const textarea = this.editorTextarea()?.nativeElement;
-    const output = this.outputElement()?.nativeElement;
-
-    if (!textarea || !output) return;
-
-    output.style.width = textarea.scrollWidth + 'px';
-    output.style.height = textarea.scrollHeight + 'px';
-  }
-
   constructor(private prism: PrismService) {
     effect(() => {
-      const textarea = this.editorTextarea();
-      if (textarea) {
-        textarea.nativeElement.focus();
-      }
-    });
-
-    effect(() => {
-      const textarea = this.editorTextarea();
-      const output = this.outputElement();
-
-      if (textarea && output) {
-        this.syncHighlighting();
-      }
-    });
-  }
-
-  handleContainerScroll(event: Event): void {
-    if (this.isScrolling()) return;
-
-    this.isScrolling.set(true);
-    const target = event.target as HTMLElement;
-    this.scrollTop.set(target.scrollTop);
-    this.scrollLeft.set(target.scrollLeft);
-
-    requestAnimationFrame(() => {
-      this.isScrolling.set(false);
-    });
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['code']) {
       this.highlightCode();
-    }
+    });
   }
 
-  onSelectionChange(): void {
-    requestAnimationFrame(() => {
-      const textarea = this.editorTextarea()?.nativeElement;
-      if (textarea) {
-        this.scrollTop.set(textarea.scrollTop);
-        this.scrollLeft.set(textarea.scrollLeft);
-      }
-    });
+  /*
+  Sync scroll positions (X and Y) between the textarea and the highlighted code display.
+  */
+  handleScroll(): void {
+    if (!this.editorTextarea()?.nativeElement) return;
+
+    const textarea = this.editorTextarea()!.nativeElement;
+    this.scrollTop.set(textarea.scrollTop);
+    this.scrollLeft.set(textarea.scrollLeft);
   }
 
   onKeyDown(event: KeyboardEvent) {
     if (event.key === 'Tab') {
       event.preventDefault();
-      event.stopPropagation();
 
-      /* If empty, we update the code with placeholder text*/
-      if (!this.code) {
-        this.code = this.placeholder;
-        this.onCodeChange();
-
-        // Moving cursor to last position
-        const textarea = event.target as HTMLTextAreaElement;
-        setTimeout(() => {
-          textarea.selectionStart = textarea.selectionEnd =
-            this.placeholder.length;
-        }, 0);
+      if (!this.code()) {
+        this.code.set(this.placeholder());
         return;
       }
 
+      /* Handle tab insertion */
       const textarea = event.target as HTMLTextAreaElement;
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
       const tabChar = '\t';
 
-      this.code =
-        this.code.substring(0, start) + tabChar + this.code.substring(end);
+      this.code.set(
+        this.code().substring(0, start) + tabChar + this.code().substring(end)
+      );
 
+      /* TODO: In the future try to delete setTimeout
+        Currently, without setTimeout, the cursor jumps to the end of the textarea after inserting the tab.
+        Because it updates code signal, which triggers re-rendering of the textarea.
+      */
       setTimeout(() => {
         textarea.selectionStart = textarea.selectionEnd =
           start + tabChar.length;
-        this.onCodeChange();
       }, 0);
     }
   }
 
   private highlightCode(): void {
-    this.highlighted.set(this.prism.highlight(this.code));
+    this.highlighted.set(this.prism.highlight(this.code()));
   }
 }
