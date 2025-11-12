@@ -81,18 +81,13 @@ export class DbmlCodeEditorComponent {
       const end = textarea.selectionEnd;
       const tabChar = '\t';
 
-      this.code.set(
-        this.code().substring(0, start) + tabChar + this.code().substring(end)
-      );
+      const newValue =
+        this.code().substring(0, start) + tabChar + this.code().substring(end);
 
-      /* TODO: In the future try to delete setTimeout
-        Currently, without setTimeout, the cursor jumps to the end of the textarea after inserting the tab.
-        Because it updates code signal, which triggers re-rendering of the textarea.
-      */
-      setTimeout(() => {
-        textarea.selectionStart = textarea.selectionEnd =
-          start + tabChar.length;
-      }, 0);
+      this.code.set(newValue);
+      textarea.value = newValue;
+
+      textarea.selectionStart = textarea.selectionEnd = start + tabChar.length;
     }
   }
 
