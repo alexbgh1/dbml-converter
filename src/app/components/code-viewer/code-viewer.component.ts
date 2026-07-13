@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 
 import Prism from 'prismjs';
 
@@ -13,7 +13,7 @@ import { PrismService } from '../../services/prism/prism.service';
 @Component({
   selector: 'app-code-viewer',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './code-viewer.component.html',
   styleUrls: ['./code-viewer.component.css'],
 })

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 
 import { CODE_VIEW_MODE_MAP } from '../../services/view-mode/constants';
 
@@ -13,15 +13,13 @@ import { FileDocsIconComponent } from '../../shared/components/icons/file-docs/f
   selector: 'app-header',
   templateUrl: './header.component.html',
   imports: [
-    CommonModule,
     RouterLink,
     RouterLinkActive,
-    // Icons
     PreviewIconComponent,
     EditorIconComponent,
     HomeIconComponent,
-    FileDocsIconComponent,
-  ],
+    FileDocsIconComponent
+],
 })
 export class HeaderComponent {
   CODE_VIEW_MODE_MAP = CODE_VIEW_MODE_MAP;
