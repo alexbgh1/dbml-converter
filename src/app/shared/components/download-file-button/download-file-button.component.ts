@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { saveAs } from 'file-saver';
 
 import { DownloadIconComponent } from '../icons';
@@ -13,6 +13,7 @@ import {
   host: {
     class: 'flex items-center',
   },
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './download-file-button.component.html',
 })
 export class DownloadFileButtonComponent {

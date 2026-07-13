@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ArrowRightIconComponent } from '../../../shared/components/icons/arrows/arrow-right-icon.component';
 
@@ -6,6 +6,7 @@ import { ArrowRightIconComponent } from '../../../shared/components/icons/arrows
   selector: 'app-title',
   templateUrl: './title.component.html',
   imports: [RouterLink, ArrowRightIconComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     class: 'flex flex-col mt-6 text-left max-w-[600px] mx-4',
   },

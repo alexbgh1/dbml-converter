@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 import {
   AT_SYMBOL,
@@ -11,6 +11,7 @@ import { FileIconComponent } from '../../../../shared/components/icons';
 @Component({
   selector: 'app-output-files-mobile',
   templateUrl: './output-files-mobile.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [FileIconComponent],
 })
 export class OutputFilesMobileComponent {

@@ -6,6 +6,7 @@ import {
   input,
   output,
   signal,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { RippleEffect } from './interfaces/expanding-circle-button.interface';
 import { OutputType } from '../../../components/dbml-converter/interfaces/dbml-converter.interface';
@@ -17,6 +18,7 @@ import { OutputType } from '../../../components/dbml-converter/interfaces/dbml-c
     class: 'block',
   },
   templateUrl: './expanding-circle-button.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./expanding-circle-button.component.css'],
 })
 export class ExpandingCircleButtonComponent {

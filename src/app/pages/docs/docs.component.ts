@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-docs',
   templateUrl: './docs.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     class:
       ' flex flex-col flex-1 overflow-auto p-6 lg:p-12 bg-bg-primary text-text',

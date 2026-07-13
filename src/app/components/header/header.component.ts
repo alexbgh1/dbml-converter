@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 
@@ -12,6 +12,7 @@ import { FileDocsIconComponent } from '../../shared/components/icons/file-docs/f
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     RouterLink,
     RouterLinkActive,

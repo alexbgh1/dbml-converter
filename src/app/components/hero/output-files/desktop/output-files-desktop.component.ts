@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 import {
   AT_SYMBOL,
@@ -13,6 +13,7 @@ import { SVG_LINES, SVG_OPACITY, SVG_VIEWBOX } from './svg-lines/svg-lines';
   selector: 'app-output-files-desktop',
   templateUrl: './output-files-desktop.component.html',
   imports: [FileIconComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [
     `
       @keyframes dash {

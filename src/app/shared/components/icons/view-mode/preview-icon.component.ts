@@ -1,8 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { cn } from '../../../utils/cn';
 
 @Component({
   selector: 'preview-icon',
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <svg
       [class]="mergedClassList()"

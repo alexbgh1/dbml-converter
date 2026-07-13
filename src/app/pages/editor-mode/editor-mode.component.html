@@ -211,7 +211,7 @@
                 selectedFile()?.filename
               }}</span>
               <span class="text-xs text-text-muted"
-                >{{ selectedFile()?.content | codeChars }} chars</span
+                >{{ $safeNavigationMigration(selectedFile()?.content) | codeChars }} chars</span
               >
             </div>
             <!-- Copy & Download buttons -->

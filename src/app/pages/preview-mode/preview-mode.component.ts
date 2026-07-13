@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { DbmlStateService } from '../../services/dbml-state/dbml-state.service';
@@ -39,6 +39,7 @@ import { DownloadFileButtonComponent } from '../../shared/components/download-fi
     CodeCharsPipe,
   ],
   templateUrl: './preview-mode.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: { class: 'flex-1' },
 })
 export class PreviewModeComponent {

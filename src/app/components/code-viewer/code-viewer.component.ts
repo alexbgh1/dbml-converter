@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 
 
 import Prism from 'prismjs';
@@ -15,6 +15,7 @@ import { PrismService } from '../../services/prism/prism.service';
   standalone: true,
   imports: [],
   templateUrl: './code-viewer.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./code-viewer.component.css'],
 })
 export class CodeViewerComponent implements OnChanges {

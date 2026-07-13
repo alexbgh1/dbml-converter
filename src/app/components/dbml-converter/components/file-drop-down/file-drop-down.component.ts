@@ -1,4 +1,4 @@
-import { Component, Input, signal } from '@angular/core';
+import { Component, Input, signal, ChangeDetectionStrategy } from '@angular/core';
 import {
   ChevronRightIconComponent,
   ChevronDownIconComponent,
@@ -20,6 +20,7 @@ import { DownloadFileButtonComponent } from '../../../../shared/components/downl
     FileIconComponent,
   ],
   selector: 'file-drop-down',
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './file-drop-down.component.html',
 })
 export class FileDropDownComponent {

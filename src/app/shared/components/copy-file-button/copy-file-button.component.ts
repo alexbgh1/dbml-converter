@@ -1,4 +1,4 @@
-import { Component, Input, signal, WritableSignal } from '@angular/core';
+import { Component, Input, signal, WritableSignal, ChangeDetectionStrategy } from '@angular/core';
 import { CopyIconComponent } from '../icons';
 
 @Component({
@@ -7,6 +7,7 @@ import { CopyIconComponent } from '../icons';
   host: {
     class: 'flex gap-1 items-center',
   },
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './copy-file-button.component.html',
 })
 export class CopyFileButtonComponent {

@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 
 import { PrismService } from '../../../services/prism/prism.service';
 
@@ -8,6 +8,7 @@ import { CodeLine } from '../../dbml-converter/interfaces/editor.interface';
 @Component({
   selector: 'app-code-editor',
   templateUrl: './code-editor.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   host: {
     class:
       'relative group transition-transform duration-500 animate-float w-full ',

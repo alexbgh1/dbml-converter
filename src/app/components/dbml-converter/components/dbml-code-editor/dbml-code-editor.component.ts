@@ -8,6 +8,7 @@ import {
   computed,
   input,
   model,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -28,6 +29,7 @@ import { CodeLine } from '../../interfaces/editor.interface';
   imports: [FormsModule],
   selector: 'app-dbml-code-editor',
   templateUrl: './dbml-code-editor.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./dbml-code-editor.component.css'],
 })
 export class DbmlCodeEditorComponent {

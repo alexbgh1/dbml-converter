@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
@@ -6,6 +6,7 @@ import { filter, map } from 'rxjs';
 @Component({
   selector: 'app-footer',
   templateUrl: './footer.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [],
 })
 export class FooterComponent {
