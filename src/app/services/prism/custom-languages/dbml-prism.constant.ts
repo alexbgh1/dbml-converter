@@ -10,6 +10,8 @@
 
 */
 
+import * as Prism from 'prismjs';
+
 (function (Prism: any) {
   Prism.languages.dbml = {
     comment: {
@@ -48,13 +50,20 @@
       },
     },
     operator: /[<>=]/,
+    'enum-value': {
+      // This token must run before `delimiter`; otherwise Prism removes `{`
+      // first and makes the enum declaration name look like a standalone line.
+      pattern: /(^[\t ]*)[a-zA-Z_][a-zA-Z0-9_]*(?=[\t ]*(?:\/\/.*)?$)/m,
+      lookbehind: true,
+      alias: 'property',
+    },
     delimiter: /[{}()]/,
     string: {
       pattern: /(["'])(?:(?!\1).)*\1/,
       greedy: true,
     },
     property: {
-      pattern: /\b([a-z][a-zA-Z0-9_]*)\s+(?=\w)/,
+      pattern: /\b([a-z][a-zA-Z0-9_]*)[\t ]+(?=\w)/,
       greedy: true,
     },
     identifier: /\b[a-zA-Z_][a-zA-Z0-9_]*\b/,

@@ -1,19 +1,31 @@
-import { DATA_TYPES } from '../../dbml-parser/constants';
+import { parseDbType, typeFamily } from '../../dbml-parser/helpers';
 
 export function mapDbTypeToTypeOrmType(dbType: string): string {
-  const type = dbType.toLowerCase();
+  const { base } = parseDbType(dbType);
 
-  if (DATA_TYPES.Integer.some((t) => type.includes(t))) return 'int';
-  if (DATA_TYPES.String.some((t) => type.includes(t))) return 'varchar';
-  if (DATA_TYPES.Date.some((t) => type.includes(t))) {
-    if (type.includes('stamp')) return 'timestamp';
-    if (type.includes('time')) return 'time';
-    return 'date';
+  switch (typeFamily(base)) {
+    case 'uuid':
+      return 'uuid';
+    case 'decimal':
+      return 'decimal';
+    case 'integer':
+      return base === 'bigint' ? 'bigint' : 'int';
+    case 'string':
+      return 'varchar';
+    case 'date':
+      if (base.startsWith('timestamp')) return 'timestamp';
+      if (base.startsWith('datetime')) return 'datetime';
+      if (base.startsWith('time')) return 'time';
+      return 'date';
+    case 'boolean':
+      return 'boolean';
+    case 'float':
+      return 'float';
+    case 'json':
+      return 'json';
+
+    // Unknown type: fallback
+    default:
+      return 'varchar';
   }
-  if (DATA_TYPES.Boolean.some((t) => type.includes(t))) return 'boolean';
-  if (DATA_TYPES.Float.some((t) => type.includes(t))) return 'float';
-  if (type.includes('decimal')) return 'decimal';
-  if (DATA_TYPES.Json.some((t) => type.includes(t))) return 'json';
-
-  return 'varchar';
 }

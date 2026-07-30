@@ -1,0 +1,501 @@
+<section
+  class="flex min-h-[calc(100vh-130px)] flex-col bg-bg-primary p-4 md:p-6"
+>
+  <header class="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h2 class="text-lg font-semibold text-text">ER diagram</h2>
+      <p class="text-xs text-text-muted">
+        Read only, derived from the last Convert
+      </p>
+
+      <div class="mt-2 flex gap-2 justify-start">
+        <button
+          type="button"
+          class="rounded-md border border-border-muted bg-bg-secondary px-2.5 py-1 text-xs text-text-muted hover:bg-bg-tertiary hover:text-text focus-visible:outline-2 focus-visible:outline-accent"
+          (click)="toggleInputPanel()"
+          [attr.aria-expanded]="inputPanelOpen()"
+          aria-controls="er-diagram-input-panel"
+        >
+          {{ inputPanelOpen() ? "Hide sidebar" : "Show sidebar" }}
+        </button>
+        <button
+          type="button"
+          class="rounded-md border border-border-muted bg-bg-secondary px-2.5 py-1 text-xs text-text-muted hover:bg-bg-tertiary hover:text-text focus-visible:outline-2 focus-visible:outline-accent disabled:cursor-wait disabled:opacity-50"
+          (click)="autoArrange()"
+          [disabled]="isLayoutLoading()"
+        >
+          Auto arrange
+        </button>
+      </div>
+    </div>
+
+    @if (hasConverted() && hasDiagramInput()) {
+      <div
+        class="flex flex-wrap items-center justify-end gap-2"
+        aria-label="Diagram tools"
+      >
+        <div
+          class="flex items-center gap-2 rounded-md border border-border-muted bg-bg-secondary px-2 py-1 text-[10px] text-text-muted"
+          aria-label="Diagram legend"
+        >
+          <span class="font-medium uppercase tracking-wide text-zinc-400"
+            >Legend</span
+          >
+          <span
+            class="rounded bg-amber-500/12 px-1 text-amber-200"
+            aria-label="Primary key (PK)"
+            title="Primary key"
+            >PK</span
+          >
+          <span
+            class="rounded bg-sky-500/12 px-1 text-sky-200"
+            aria-label="Foreign key (FK)"
+            title="Foreign key"
+            >FK</span
+          >
+          <span
+            class="rounded bg-emerald-500/12 px-1 text-emerald-200"
+            aria-label="Unique (UQ)"
+            title="Unique"
+            >UQ</span
+          >
+          <span
+            class="rounded bg-violet-500/12 px-1 text-violet-200"
+            aria-label="Not null (NN)"
+            title="Not null"
+            >NN</span
+          >
+          <span
+            class="rounded border border-zinc-600 px-1 text-zinc-400"
+            title="Junction table"
+            >junction</span
+          >
+        </div>
+
+        <div
+          class="flex items-center gap-1 rounded-md border border-border-muted bg-bg-secondary p-1"
+          aria-label="Diagram viewport controls"
+        >
+          <button
+            type="button"
+            class="rounded px-2 py-1 text-text-muted hover:bg-bg-tertiary hover:text-text focus-visible:outline-2 focus-visible:outline-accent"
+            (click)="zoomBy(-0.1)"
+            aria-label="Zoom out"
+            [disabled]="graph().nodes.length === 0"
+          >
+            &minus;
+          </button>
+          <span class="min-w-12 text-center text-xs text-text-muted"
+            >{{ (zoom() * 100).toFixed(0) }}%</span
+          >
+          <button
+            type="button"
+            class="rounded px-2 py-1 text-text-muted hover:bg-bg-tertiary hover:text-text focus-visible:outline-2 focus-visible:outline-accent"
+            (click)="zoomBy(0.1)"
+            aria-label="Zoom in"
+            [disabled]="graph().nodes.length === 0"
+          >
+            +
+          </button>
+          <span class="mx-1 h-4 w-px bg-border-muted"></span>
+          <button
+            type="button"
+            class="rounded px-2 py-1 text-xs text-text-muted hover:bg-bg-tertiary hover:text-text focus-visible:outline-2 focus-visible:outline-accent"
+            (click)="fitToScreen()"
+            [disabled]="graph().nodes.length === 0"
+          >
+            Fit
+          </button>
+          <button
+            type="button"
+            class="rounded px-2 py-1 text-xs text-text-muted hover:bg-bg-tertiary hover:text-text focus-visible:outline-2 focus-visible:outline-accent"
+            (click)="resetViewport()"
+            [disabled]="graph().nodes.length === 0"
+          >
+            Reset
+          </button>
+        </div>
+      </div>
+    } @else {
+      <span
+        class="rounded-md border border-border-muted bg-bg-secondary px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-zinc-500"
+        aria-label="Diagram layout status"
+        aria-live="polite"
+      >
+        {{ layoutStatusLabel() }}
+      </span>
+    }
+  </header>
+
+  <div class="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
+    @if (inputPanelOpen()) {
+      <aside
+        id="er-diagram-input-panel"
+        class="w-full shrink-0 overflow-hidden rounded-lg border border-border-muted bg-bg-secondary lg:w-96"
+        aria-label="DBML input"
+      >
+        <div
+          class="flex flex-wrap items-center justify-between gap-2 border-b border-border-muted px-4 py-3"
+        >
+          <div>
+            <h3 class="text-sm font-medium text-text">Input</h3>
+            <p class="text-xs text-text-muted">Updates on Convert</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <app-load-dbml-example-button
+              label="Load example"
+              (loadRequested)="loadExample()"
+            ></app-load-dbml-example-button>
+            <app-dbml-conversion-actions
+              [isConverting]="isConverting()"
+              (convertRequested)="handleConvert()"
+              (clearRequested)="clearAll()"
+            ></app-dbml-conversion-actions>
+          </div>
+        </div>
+        <div class="p-4">
+          <app-dbml-code-editor
+            [code]="dbmlContent()"
+            [height]="'500px'"
+            (codeChange)="onDbmlInput($event)"
+          ></app-dbml-code-editor>
+          @if (diagnosticsState().freshness !== "not-converted") {
+            <div class="mt-3">
+              <app-diagnostics-panel
+                [state]="diagnosticsState()"
+                (navigate)="goToLine($event)"
+                (repair)="applyRepair($event)"
+                (undo)="undoRepair()"
+                (validate)="handleConvert()"
+              ></app-diagnostics-panel>
+            </div>
+          }
+        </div>
+      </aside>
+    }
+
+    <main class="flex min-h-0 min-w-0 flex-1 flex-col">
+      @if (layoutWarning(); as warning) {
+        <div
+          class="mb-3 rounded-md border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-amber-100/80"
+          role="status"
+          aria-label="Layout warning"
+        >
+          {{ warning.message }}
+        </div>
+      }
+
+      @if (layoutError(); as error) {
+        <div
+          class="mb-3 rounded-md border border-red-500/20 bg-red-500/5 px-3 py-2 text-xs text-red-200/80"
+          role="alert"
+          aria-label="Layout error"
+        >
+          {{ error.message }}
+          @if (graph().nodes.length > 0) {
+            <span class="ml-1 text-text-muted"
+              >The last successful layout remains visible.</span
+            >
+          }
+        </div>
+      }
+
+      @if (!hasConverted()) {
+        <div
+          class="flex flex-1 flex-col items-center justify-center rounded-lg border border-dashed border-border-muted p-10 text-center"
+        >
+          <p class="text-text">No converted schema yet.</p>
+          <p class="mt-1 text-sm text-text-muted">
+            Use the input panel to convert DBML.
+          </p>
+        </div>
+      } @else if (!hasDiagramInput()) {
+        <div
+          class="flex flex-1 items-center justify-center rounded-lg border border-dashed border-border-muted p-10 text-center text-text-muted"
+        >
+          The last conversion contains no tables to display.
+        </div>
+      } @else if (graph().nodes.length === 0 && isLayoutLoading()) {
+        <div
+          class="flex flex-1 flex-col items-center justify-center rounded-lg border border-border-muted bg-code-box-bg p-10 text-center"
+          aria-label="Diagram layout loading"
+          aria-live="polite"
+        >
+          <span
+            class="mb-3 h-5 w-5 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-300"
+            aria-hidden="true"
+          ></span>
+          <p class="text-sm text-zinc-300">Arranging tables&hellip;</p>
+          <p class="mt-1 text-xs text-text-muted">
+            The diagram will appear when the layout is ready.
+          </p>
+        </div>
+      } @else if (graph().nodes.length === 0 && layoutError()) {
+        <div
+          class="flex flex-1 flex-col items-center justify-center rounded-lg border border-dashed border-red-500/20 p-10 text-center"
+        >
+          <p class="text-sm text-zinc-300">
+            The diagram could not be arranged.
+          </p>
+          <button
+            type="button"
+            class="mt-4 rounded border border-border-muted bg-bg-secondary px-3 py-2 text-xs text-text-muted hover:bg-bg-tertiary hover:text-text"
+            (click)="autoArrange()"
+          >
+            Try again
+          </button>
+        </div>
+      } @else {
+        <div
+          #viewport
+          class="relative min-h-[620px] flex-1 touch-none overflow-hidden rounded-lg border border-border-muted bg-code-box-bg"
+          [class.cursor-grab]="!isCanvasPanning() && !isLayoutLoading()"
+          [class.cursor-grabbing]="isCanvasPanning()"
+          [class.cursor-wait]="isLayoutLoading()"
+          (wheel)="onWheel($event)"
+          (pointerdown)="startPan($event)"
+          (pointermove)="movePan($event)"
+          (pointerup)="endPan($event)"
+          (pointercancel)="endPan($event)"
+          (lostpointercapture)="cancelPointerGesture($event)"
+          (dragstart)="$event.preventDefault()"
+          (click)="onCanvasClick()"
+          aria-label="Entity relationship diagram canvas"
+        >
+          <div
+            class="pointer-events-none absolute inset-0 opacity-35"
+            style="
+              background-image: radial-gradient(
+                circle,
+                #71717a 1px,
+                transparent 1px
+              );
+              background-size: 24px 24px;
+            "
+            aria-hidden="true"
+          ></div>
+
+          @if (isLayoutLoading()) {
+            <div
+              class="pointer-events-none absolute right-3 top-3 z-30 rounded border border-border-muted bg-bg-secondary/90 px-2 py-1 text-[10px] text-text-muted shadow"
+              role="status"
+            >
+              Arranging&hellip;
+            </div>
+          }
+
+          <div
+            class="absolute left-0 top-0 origin-top-left will-change-transform"
+            [style.width.px]="graph().layout.width"
+            [style.height.px]="graph().layout.height"
+            [style.transform]="transform()"
+          >
+            <svg
+              class="pointer-events-none absolute inset-0 select-none overflow-visible"
+              [attr.width]="graph().layout.width"
+              [attr.height]="graph().layout.height"
+              aria-hidden="true"
+            >
+              <g [attr.transform]="graphOffset()">
+                @for (edge of graph().edges; track edge.id) {
+                  <path
+                    [attr.data-edge-id]="edge.id"
+                    data-diagram-interactive
+                    [attr.d]="edge.layout.path"
+                    fill="none"
+                    stroke="transparent"
+                    stroke-width="14"
+                    vector-effect="non-scaling-stroke"
+                    pointer-events="stroke"
+                    (click)="selectEdge($event, edge)"
+                  />
+                  <path
+                    [attr.d]="edge.layout.path"
+                    fill="none"
+                    stroke="currentColor"
+                    [attr.stroke-width]="edgeIsSelected(edge) ? 2.25 : 1.5"
+                    class="transition-opacity duration-150"
+                    [class.text-accent]="edgeIsSelected(edge)"
+                    [class.text-zinc-400]="
+                      edgeIsEmphasized(edge) && !edgeIsSelected(edge)
+                    "
+                    [class.text-zinc-700]="!edgeIsEmphasized(edge)"
+                    [class.opacity-35]="!edgeIsEmphasized(edge)"
+                  />
+                  <text
+                    [attr.x]="edge.layout.labelX"
+                    [attr.y]="edge.layout.labelY"
+                    text-anchor="middle"
+                    stroke="#18181b"
+                    stroke-width="5"
+                    paint-order="stroke"
+                    class="fill-zinc-400 text-[11px] transition-opacity duration-150"
+                    [class.fill-accent]="edgeIsSelected(edge)"
+                    [class.opacity-30]="!edgeIsEmphasized(edge)"
+                  >
+                    {{ edge.layout.renderCardinality }}
+                  </text>
+                }
+              </g>
+            </svg>
+
+            @for (node of graph().nodes; track node.id) {
+              <article
+                data-node-card
+                class="absolute z-10 overflow-hidden rounded-md border border-zinc-700 bg-bg-secondary shadow-md transition-[opacity,border-color,box-shadow] duration-150"
+                [class.border-zinc-400]="
+                  nodeIsDirectlySelected(node) || nodeIsDragging(node)
+                "
+                [class.ring-1]="
+                  nodeIsDirectlySelected(node) || nodeIsDragging(node)
+                "
+                [class.ring-zinc-500/40]="nodeIsDirectlySelected(node)"
+                [class.opacity-40]="hasSelection() && !nodeIsEmphasized(node)"
+                [class.z-20]="nodeIsDragging(node)"
+                [class.shadow-xl]="nodeIsDragging(node)"
+                [class.ring-zinc-400/30]="nodeIsDragging(node)"
+                [attr.data-dragging]="nodeIsDragging(node) ? 'true' : null"
+                [style.left.px]="node.layout.x - graph().layout.minX"
+                [style.top.px]="node.layout.y - graph().layout.minY"
+                [style.width.px]="node.layout.width"
+                [style.height.px]="node.layout.height"
+                (click)="$event.stopPropagation()"
+              >
+                <div
+                  class="flex border-b border-zinc-700 bg-zinc-900/45"
+                  [style.height.px]="cardHeaderHeight"
+                >
+                  <button
+                    type="button"
+                    class="flex min-w-0 flex-1 items-center gap-2 text-left hover:bg-white/[0.025] focus-visible:outline-2 focus-visible:outline-accent"
+                    [style.padding-inline.px]="cardContentPaddingX"
+                    [class.cursor-grab]="
+                      !nodeIsDragging(node) && !isLayoutLoading()
+                    "
+                    [class.cursor-grabbing]="nodeIsDragging(node)"
+                    [class.cursor-wait]="isLayoutLoading()"
+                    [attr.aria-pressed]="nodeButtonIsPressed(node)"
+                    (pointerdown)="startNodeDrag($event, node)"
+                    (click)="selectNode($event, node)"
+                  >
+                    <span
+                      class="min-w-0 flex-1 truncate font-mono text-sm font-semibold text-zinc-100"
+                      [title]="node.label"
+                      >{{ node.label }}</span
+                    >
+                    @if (node.alias) {
+                      <span
+                        data-node-drag-excluded
+                        class="shrink-0 text-[10px] text-text-muted"
+                        >as {{ node.alias }}</span
+                      >
+                    }
+                    @if (node.isJunction) {
+                      <span
+                        data-node-drag-excluded
+                        class="shrink-0 rounded border border-zinc-600 px-1 py-0.5 text-[9px] text-zinc-400"
+                        >junction</span
+                      >
+                    }
+                  </button>
+                  @if (node.sourceLine !== undefined) {
+                    <button
+                      type="button"
+                      class="shrink-0 border-l border-zinc-700 px-2.5 text-zinc-500 hover:bg-bg-tertiary hover:text-zinc-200 focus-visible:outline-2 focus-visible:outline-accent"
+                      (click)="showSource($event, node.sourceLine)"
+                      [attr.aria-label]="'Show source for table ' + node.label"
+                      [title]="'Show source for table ' + node.label"
+                    >
+                      &#8599;
+                    </button>
+                  }
+                </div>
+
+                <div>
+                  @for (column of node.columns; track column.id) {
+                    <div
+                      class="flex border-b border-zinc-800/90 last:border-b-0"
+                      [style.height.px]="cardRowHeight"
+                      [class.bg-white/[0.035]]="columnIsSelected(node, column)"
+                    >
+                      <button
+                        type="button"
+                        class="flex min-w-0 flex-1 items-center gap-1 text-left text-xs hover:bg-white/[0.025] focus-visible:outline-2 focus-visible:outline-accent"
+                        [style.padding-inline.px]="cardContentPaddingX"
+                        [attr.aria-pressed]="columnIsSelected(node, column)"
+                        (click)="selectColumn($event, node, column)"
+                      >
+                        <span
+                          class="min-w-12 flex-1 truncate font-mono text-zinc-300"
+                          [title]="column.name"
+                          >{{ column.name }}</span
+                        >
+                        @for (badge of column.badges; track badge) {
+                          @switch (badge) {
+                            @case ("PK") {
+                              <span
+                                class="shrink-0 rounded bg-amber-500/12 px-1 text-[9px] text-amber-200"
+                                >PK</span
+                              >
+                            }
+                            @case ("FK") {
+                              <span
+                                class="shrink-0 rounded bg-sky-500/12 px-1 text-[9px] text-sky-200"
+                                >FK</span
+                              >
+                            }
+                            @case ("UQ") {
+                              <span
+                                class="shrink-0 rounded bg-emerald-500/12 px-1 text-[9px] text-emerald-200"
+                                >UQ</span
+                              >
+                            }
+                            @case ("NN") {
+                              <span
+                                class="shrink-0 rounded bg-violet-500/12 px-1 text-[9px] text-violet-200"
+                                >NN</span
+                              >
+                            }
+                          }
+                        }
+                        <span
+                          class="max-w-14 shrink-0 truncate text-[10px] text-zinc-500"
+                          [title]="column.type"
+                          >{{ column.type }}</span
+                        >
+                      </button>
+                      @if (column.sourceLine !== undefined) {
+                        <button
+                          type="button"
+                          class="shrink-0 border-l border-zinc-800 px-2 text-[11px] text-zinc-600 hover:bg-bg-tertiary hover:text-zinc-300 focus-visible:outline-2 focus-visible:outline-accent"
+                          (click)="showSource($event, column.sourceLine)"
+                          [attr.aria-label]="
+                            'Show source for ' + node.label + '.' + column.name
+                          "
+                          [title]="
+                            'Show source for ' + node.label + '.' + column.name
+                          "
+                        >
+                          &#8599;
+                        </button>
+                      }
+                    </div>
+                  }
+                  @if (node.columns.length === 0) {
+                    <div
+                      class="flex items-center text-xs text-text-muted"
+                      [style.height.px]="cardEmptyBodyHeight"
+                      [style.padding-inline.px]="cardContentPaddingX"
+                    >
+                      No columns
+                    </div>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+        </div>
+      }
+    </main>
+  </div>
+</section>

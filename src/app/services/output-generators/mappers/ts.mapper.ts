@@ -1,15 +1,23 @@
-import { DATA_TYPES } from '../../dbml-parser/constants';
+import { parseDbType, typeFamily } from '../../dbml-parser/helpers';
 
 export function mapDbTypeToTsType(dbType: string): string {
-  const type = dbType.toLowerCase();
+  const { base } = parseDbType(dbType);
 
-  if (DATA_TYPES.Integer.some((t) => type.includes(t))) return 'number';
-  if (DATA_TYPES.String.some((t) => type.includes(t))) return 'string';
-  if (DATA_TYPES.Date.some((t) => type.includes(t))) return 'Date';
-  if (DATA_TYPES.Boolean.some((t) => type.includes(t))) return 'boolean';
-  if (DATA_TYPES.Float.some((t) => type.includes(t))) return 'number';
-  if (DATA_TYPES.Json.some((t) => type.includes(t)))
-    return 'Record<string, any>';
-
-  return 'string';
+  switch (typeFamily(base)) {
+    case 'integer':
+    case 'float':
+    case 'decimal':
+      return 'number';
+    case 'string':
+    case 'uuid':
+      return 'string';
+    case 'date':
+      return 'Date';
+    case 'boolean':
+      return 'boolean';
+    case 'json':
+      return 'Record<string, any>';
+    default:
+      return 'string';
+  }
 }

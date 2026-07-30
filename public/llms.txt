@@ -1,0 +1,24 @@
+# DBML Converter
+
+> DBML Converter is a browser-based tool that converts DBML schemas into JSON, Prisma schemas, and TypeORM entities, with diagnostics and an interactive ER diagram.
+
+DBML is parsed into a shared JSON representation before the Prisma and TypeORM outputs are generated. Conversion diagnostics describe invalid or potentially unsupported input, and some diagnostics provide optional repair actions.
+
+Important notes:
+
+- Schema conversion runs in the browser.
+- Generated output should be reviewed before use in production.
+- Split View is intended for quick conversion and comparison.
+- Files View organizes generated output as individual files.
+- ER Diagram provides a visual, draggable representation of tables and relationships.
+
+## Application
+
+- [DBML Converter](https://alexbgh1.github.io/dbml-converter/): Project overview and entry point.
+- [Split View](https://alexbgh1.github.io/dbml-converter/split-view): Edit DBML and compare generated outputs.
+- [Files View](https://alexbgh1.github.io/dbml-converter/files-view): Browse and download generated files.
+- [ER Diagram](https://alexbgh1.github.io/dbml-converter/diagram): Visualize tables, columns, keys, and relationships.
+
+## Project
+
+- [Source repository](https://github.com/alexbgh1/dbml-converter): Application source code, README, and development history.

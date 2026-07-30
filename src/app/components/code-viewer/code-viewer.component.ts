@@ -1,7 +1,9 @@
-import { Component, Input, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
-
-
-import Prism from 'prismjs';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 
 import { DEFAULT_PRISM_LANGUAGE } from '../../shared/constants/code-language';
 
@@ -18,36 +20,15 @@ import { PrismService } from '../../services/prism/prism.service';
   changeDetection: ChangeDetectionStrategy.Eager,
   styleUrls: ['./code-viewer.component.css'],
 })
-export class CodeViewerComponent implements OnChanges {
-  DEFAULT_PRISM_LANGUAGE = DEFAULT_PRISM_LANGUAGE;
+export class CodeViewerComponent {
+  code = input('');
+  language = input(DEFAULT_PRISM_LANGUAGE);
+  height = input('200px');
 
-  @Input() code: string = '';
-  @Input() language: string = DEFAULT_PRISM_LANGUAGE;
-  @Input() height: string = '200px';
-
-  charsCount: number = 0;
-
-  highlightedCode: string = '';
+  highlightedCode = computed(() => {
+    const code = this.code();
+    return code ? this.prismService.highlight(code, this.language()) : '';
+  });
 
   constructor(private prismService: PrismService) {}
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['code'] || changes['language']) {
-      this.highlight();
-    }
-  }
-
-  private highlight(): void {
-    if (!this.code) {
-      this.highlightedCode = '';
-      return;
-    }
-
-    const language =
-      this.language in Prism.languages
-        ? this.language
-        : this.DEFAULT_PRISM_LANGUAGE;
-
-    this.highlightedCode = this.prismService.highlight(this.code, language);
-  }
 }

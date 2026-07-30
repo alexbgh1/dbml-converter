@@ -33,11 +33,11 @@ export class PrismService {
 
   highlight(
     code: string,
-    language: string = this.DEFAULT_EDITOR_LANGUAGE
+    language: string = this.DEFAULT_EDITOR_LANGUAGE,
   ): string {
     if (!Prism.languages[language]) {
       console.warn(
-        `Prism language '${language}' not found, falling back to '${this.DEFAULT_PRISM_LANGUAGE}'`
+        `Prism language '${language}' not found, falling back to '${this.DEFAULT_PRISM_LANGUAGE}'`,
       );
       language = this.DEFAULT_PRISM_LANGUAGE;
     }

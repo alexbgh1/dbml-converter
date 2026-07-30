@@ -1,0 +1,113 @@
+Enum order_status {
+  pending
+  paid
+  shipped
+  cancelled
+}
+
+Table tenants {
+  id uuid [pk]
+  slug varchar(100) [not null, unique]
+}
+
+Table users {
+  id uuid [pk]
+  tenant_id uuid [not null, ref: > tenants.id]
+  manager_id uuid [ref: > users.id]
+  email varchar(255) [not null, unique]
+}
+
+Table categories {
+  id bigint [pk]
+  parent_id bigint [ref: > categories.id]
+  name varchar(255) [not null]
+}
+
+Table suppliers {
+  id bigint [pk]
+  tenant_id uuid [not null, ref: > tenants.id]
+  name varchar(255) [not null]
+}
+
+Table products {
+  id bigint [pk]
+  category_id bigint [not null, ref: > categories.id]
+  supplier_id bigint [not null, ref: > suppliers.id]
+  sku varchar(80) [not null, unique]
+}
+
+Table warehouses {
+  id bigint [pk]
+  tenant_id uuid [not null, ref: > tenants.id]
+  code varchar(40) [not null, unique]
+}
+
+Table inventory {
+  warehouse_id bigint [not null, ref: > warehouses.id]
+  product_id bigint [not null, ref: > products.id]
+  available_quantity int [not null]
+
+  indexes {
+    (warehouse_id, product_id) [pk, name: 'pk_inventory']
+  }
+}
+
+Table customers {
+  id uuid [pk]
+  tenant_id uuid [not null, ref: > tenants.id]
+  account_manager_id uuid [ref: > users.id]
+  email varchar(255) [not null]
+}
+
+Table addresses {
+  id uuid [pk]
+  customer_id uuid [not null, ref: > customers.id]
+  city varchar(160) [not null]
+}
+
+Table orders {
+  id uuid [pk]
+  customer_id uuid [not null, ref: > customers.id]
+  billing_address_id uuid [not null, ref: > addresses.id]
+  shipping_address_id uuid [not null, ref: > addresses.id]
+  created_by uuid [not null, ref: > users.id]
+  status order_status [not null, default: 'pending']
+}
+
+Table order_items {
+  order_id uuid [not null, ref: > orders.id]
+  product_id bigint [not null, ref: > products.id]
+  warehouse_id bigint [not null, ref: > warehouses.id]
+  quantity int [not null]
+
+  indexes {
+    (order_id, product_id) [pk, name: 'pk_order_items']
+  }
+}
+
+Table payments {
+  id uuid [pk]
+  order_id uuid [not null, ref: > orders.id]
+  approved_by uuid [ref: > users.id]
+  external_reference varchar(160) [not null, unique]
+}
+
+Table shipments {
+  id uuid [pk]
+  order_id uuid [not null, ref: > orders.id]
+  warehouse_id bigint [not null, ref: > warehouses.id]
+  packed_by uuid [ref: > users.id]
+}
+
+Table refunds {
+  id uuid [pk]
+  payment_id uuid [not null, ref: > payments.id]
+  reviewed_by uuid [ref: > users.id]
+}
+
+Table reviews {
+  id uuid [pk]
+  customer_id uuid [not null, ref: > customers.id]
+  product_id bigint [not null, ref: > products.id]
+  moderated_by uuid [ref: > users.id]
+}

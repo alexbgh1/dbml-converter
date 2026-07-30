@@ -1,0 +1,31 @@
+<button
+  type="button"
+  class="flex cursor-pointer items-center gap-2 rounded bg-accent/60 hover:bg-accent/70 px-2 py-1 text-xs text-white disabled:cursor-not-allowed disabled:opacity-50"
+  [disabled]="isConverting()"
+  (click)="convertRequested.emit()"
+>
+  Convert
+</button>
+
+<app-action-dialog
+  [open]="clearConfirmationOpen()"
+  title="Clear everything?"
+  primaryLabel="Clear everything"
+  secondaryLabel="Cancel"
+  primaryTone="danger"
+  (primary)="confirmClear()"
+  (secondary)="cancelClear()"
+  (dismissed)="cancelClear()"
+>
+  <p>
+    This will clear the DBML input and all generated output. This action cannot
+    be undone.
+  </p>
+</app-action-dialog>
+<button
+  type="button"
+  class="cursor-pointer rounded px-2 py-1 text-xs text-text-muted hover:bg-bg-tertiary hover:text-text focus-visible:outline-2 focus-visible:outline-accent"
+  (click)="requestClear()"
+>
+  Clear
+</button>

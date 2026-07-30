@@ -1,13 +1,12 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
-
-import { CODE_VIEW_MODE_MAP } from '../../services/view-mode/constants';
+import { APP_ROUTES } from '../../shared/constants/app-routes.constants';
 
 import { PreviewIconComponent } from '../../shared/components/icons/view-mode/preview-icon.component';
 import { EditorIconComponent } from '../../shared/components/icons/view-mode/editor-icon.component';
 import { HomeIconComponent } from '../../shared/components/icons/home/home-icon.component';
-import { FileDocsIconComponent } from '../../shared/components/icons/file-docs/filde-docs.component';
+import { ErDiagramIconComponent } from '../../shared/components/icons/view-mode/er-diagram-icon.component';
 
 @Component({
   selector: 'app-header',
@@ -19,12 +18,11 @@ import { FileDocsIconComponent } from '../../shared/components/icons/file-docs/f
     PreviewIconComponent,
     EditorIconComponent,
     HomeIconComponent,
-    FileDocsIconComponent
-],
+    ErDiagramIconComponent,
+  ],
 })
 export class HeaderComponent {
-  CODE_VIEW_MODE_MAP = CODE_VIEW_MODE_MAP;
-  DEFAULT_SUFFIX = '-mode';
+  readonly APP_ROUTES = APP_ROUTES;
   isMenuOpen = false;
 
   toggleMenu() {

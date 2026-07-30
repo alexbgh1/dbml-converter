@@ -1,3 +1,5 @@
+import { Diagnostic } from '../../../dbml-parser/interfaces/diagnostics.interface';
+
 export interface GeneratedCode {
   /**
    * Each entity file generated, with the filename as key and the code content as value
@@ -8,18 +10,9 @@ export interface GeneratedCode {
    * The main module file content that imports all entities
    */
   module: string;
-}
-
-export interface CodeGenerationOptions {
-  /**
-   * Base directory for generated files
-   * by default is ./
-   */
-  baseDir?: string;
 
   /**
-   * Include explanatory comments in the generated code
-   * by default is true
+   * Output-validation diagnostics collected while generating
    */
-  includeComments?: boolean;
+  diagnostics: Diagnostic[];
 }

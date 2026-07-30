@@ -1,0 +1,11 @@
+Table valid_parents {
+  id bigint [pk]
+}
+
+Table children {
+  id bigint [pk]
+  parent_id bigint [not null]
+}
+
+Ref: children.parent_id > valid_parents.id
+Ref: children.ghost_parent_id > valid_parents.ghost_id

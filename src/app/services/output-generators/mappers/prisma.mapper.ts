@@ -1,14 +1,49 @@
-import { DATA_TYPES } from '../../dbml-parser/constants';
+import { parseDbType, typeFamily } from '../../dbml-parser/helpers';
 
-export function mapDbTypeToPrismaType(dbType: string): string {
-  const type = dbType.toLowerCase();
+export interface PrismaFieldType {
+  type: string;
+  /* Postgres native type attribute, e.g. @db.Uuid, @db.Decimal(10, 2) */
+  nativeAttr?: string;
+}
 
-  if (DATA_TYPES.Integer.some((t) => type.includes(t))) return 'Int';
-  if (DATA_TYPES.String.some((t) => type.includes(t))) return 'String';
-  if (DATA_TYPES.Date.some((t) => type.includes(t))) return 'DateTime';
-  if (DATA_TYPES.Boolean.some((t) => type.includes(t))) return 'Boolean';
-  if (DATA_TYPES.Float.some((t) => type.includes(t))) return 'Float';
-  if (DATA_TYPES.Json.some((t) => type.includes(t))) return 'Json';
+export function mapColumnTypeToPrisma(dbType: string): PrismaFieldType {
+  const { base, args } = parseDbType(dbType);
 
-  return 'String';
+  switch (typeFamily(base)) {
+    case 'uuid':
+      return { type: 'String', nativeAttr: '@db.Uuid' };
+
+    // Money/precision types must not degrade to Float
+    case 'decimal':
+      return {
+        type: 'Decimal',
+        nativeAttr:
+          args.length === 2 ? `@db.Decimal(${args[0]}, ${args[1]})` : undefined,
+      };
+
+    case 'integer':
+      return base === 'bigint' ? { type: 'BigInt' } : { type: 'Int' };
+
+    case 'string':
+      if (base === 'varchar' && args.length === 1) {
+        return { type: 'String', nativeAttr: `@db.VarChar(${args[0]})` };
+      }
+      if (base === 'char' && args.length === 1) {
+        return { type: 'String', nativeAttr: `@db.Char(${args[0]})` };
+      }
+      return { type: 'String' };
+
+    case 'date':
+      return { type: 'DateTime' };
+    case 'boolean':
+      return { type: 'Boolean' };
+    case 'float':
+      return { type: 'Float' };
+    case 'json':
+      return { type: 'Json' };
+
+    // Unknown type: fallback
+    default:
+      return { type: 'String' };
+  }
 }

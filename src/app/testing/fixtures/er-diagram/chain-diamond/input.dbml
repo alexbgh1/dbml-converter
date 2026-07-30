@@ -1,0 +1,24 @@
+Table origins {
+  id bigint [pk]
+}
+
+Table branch_alpha {
+  id bigint [pk]
+  origin_id bigint [not null, ref: > origins.id]
+}
+
+Table branch_beta {
+  id bigint [pk]
+  origin_id bigint [not null, ref: > origins.id]
+}
+
+Table merge_points {
+  id bigint [pk]
+  alpha_id bigint [not null, ref: > branch_alpha.id]
+  beta_id bigint [not null, ref: > branch_beta.id]
+}
+
+Table delivery_queue {
+  id bigint [pk]
+  merge_point_id bigint [not null, ref: > merge_points.id]
+}

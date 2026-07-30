@@ -1,0 +1,22 @@
+<button
+  type="button"
+  class="text-xs text-accent hover:underline focus-visible:outline-2 focus-visible:outline-accent"
+  (click)="confirmationOpen.set(true)"
+>
+  {{ label() }}
+</button>
+
+<app-action-dialog
+  [open]="confirmationOpen()"
+  title="Load example DBML?"
+  primaryLabel="Load example"
+  secondaryLabel="Cancel"
+  (primary)="confirm()"
+  (secondary)="cancel()"
+  (dismissed)="cancel()"
+>
+  <p>
+    Loading the example will overwrite your current DBML code. Do you want to
+    continue?
+  </p>
+</app-action-dialog>

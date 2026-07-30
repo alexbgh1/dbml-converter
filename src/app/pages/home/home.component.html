@@ -1,86 +1,257 @@
-<div class="relative overflow-hidden bg-black/60">
-  <!-- Animated gradient blobs -->
-  <div class="absolute inset-0 pointer-events-none overflow-hidden">
-    <!-- Accent blob (teal) -->
+<section class="relative isolate overflow-hidden bg-black/60">
+  <div
+    class="pointer-events-none absolute inset-0 opacity-50"
+    aria-hidden="true"
+  >
     <div
-      class="absolute w-136 h-136 rounded-full blur-3xl opacity-20 animate-blob"
-      style="
-        background: radial-gradient(
-          circle,
-          oklch(77.7% 0.152 181.912 / 0.4) 20%,
-          transparent 70%
-        );
-        top: 10%;
-        left: 10%;
-      "
+      class="absolute inset-0 bg-[linear-gradient(to_right,oklch(37%_0.013_285.805_/_0.18)_1px,transparent_1px),linear-gradient(to_bottom,oklch(37%_0.013_285.805_/_0.18)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:linear-gradient(to_bottom,black,transparent_85%)]"
     ></div>
-
-    <!-- JSON blob (blue) -->
     <div
-      class="absolute w-96 h-96 rounded-full blur-3xl opacity-15 animate-blob"
-      style="
-        background: radial-gradient(
-          circle,
-          oklch(67% 0.11 247 / 0.4) 15%,
-          transparent 70%
-        );
-        top: 20%;
-        right: 10%;
-      "
+      class="absolute -left-40 top-10 h-96 w-96 rounded-full bg-accent/10 blur-3xl"
     ></div>
-
-    <!-- Prisma blob (purple) -->
     <div
-      class="absolute w-72 h-72 rounded-full blur-3xl opacity-15 animate-blob"
-      style="
-        background: radial-gradient(
-          circle,
-          oklch(56.31% 0.1717 274.55 / 0.4) 0%,
-          transparent 70%
-        );
-        bottom: 20%;
-        left: 20%;
-      "
-    ></div>
-
-    <!-- TypeORM blob (orange) -->
-    <div
-      class="absolute w-64 h-64 rounded-full blur-3xl opacity-12 animate-blob"
-      style="
-        background: radial-gradient(
-          circle,
-          oklch(72% 0.18 44 / 0.4) 0%,
-          transparent 70%
-        );
-        bottom: 10%;
-        right: 20%;
-      "
-    ></div>
-
-    <!-- Grid pattern -->
-    <div
-      class="absolute inset-0 bg-[linear-gradient(to_right,#2e2e2e_1px,transparent_1px),linear-gradient(to_bottom,#2e2e2e_1px,transparent_1px)] bg-[size:3rem_3rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)] opacity-20"
+      class="absolute -right-40 bottom-0 h-96 w-96 rounded-full bg-prisma/10 blur-3xl"
     ></div>
   </div>
 
-  <!-- Content -->
-  <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- 65px header + 56px footer -->
+  <main
+    class="relative mx-auto grid min-h-[calc(100vh-65px-56px)] max-w-7xl items-center gap-24 xl:gap-32 px-6 py-16 lg:grid-cols-[minmax(0,0.82fr)_minmax(34rem,1.18fr)] lg:px-8 lg:py-20"
+  >
     <div
-      class="flex flex-col lg:grid lg:grid-cols-2 gap-12 lg:gap-32 items-center min-h-[calc(100vh-65px-56px)] py-12 lg:py-0"
+      class="flex text-balance flex-col gap-0 md:gap-6 justify-center md:justify-start items-center md:items-start lg:max-w-none"
     >
-      <!-- Left Column: Content -->
-      <div class="mb-6 lg:mb-24">
-        <app-title></app-title>
+      <h1
+        class="max-w-3xl block text-4xl font-semibold leading-[1.02] tracking-[-0.015em] text-accent min-[380px]:text-5xl sm:text-6xl lg:text-7xl"
+      >
+        DBML
+        <br class="hidden sm:inline" />
+        <span class="text-text"> into </span>
+        CODE
+      </h1>
+
+      <p
+        class="mt-7 text-center md:text-left max-w-xl break-words text-base leading-7 text-text-muted sm:text-lg"
+      >
+        Turn a DBML model into readable JSON, Prisma schemas and TypeORM
+        entities
+      </p>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <a
+          [routerLink]="APP_ROUTES.splitView"
+          class="group inline-flex items-center gap-2 rounded-md bg-accent px-5 py-3 text-sm font-semibold text-zinc-950 transition hover:-translate-y-0.5 hover:bg-teal-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          Open converter
+          <arrow-right-icon
+            className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+          ></arrow-right-icon>
+        </a>
+        <a
+          [routerLink]="APP_ROUTES.erDiagram"
+          class="inline-flex items-center gap-2 rounded-md border border-border-muted bg-bg-secondary/70 px-5 py-3 text-sm font-medium text-zinc-300 transition hover:border-zinc-500 hover:bg-bg-tertiary hover:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          Explore ER diagram
+          <er-diagram-icon
+            className="h-4 w-4 text-text-muted"
+          ></er-diagram-icon>
+        </a>
       </div>
 
-      <!-- Right Column: Visualization -->
-      <div class="relative max-w-lg">
-        <div class="relative flex flex-col items-center gap-8 lg:gap-12">
-          <app-code-editor></app-code-editor>
-          <app-output-files></app-output-files>
+      <dl
+        class="mt-11 grid max-w-lg grid-cols-[repeat(3,minmax(0,1fr))] gap-3 border-t border-border-muted/60 pt-6"
+      >
+        <div class="min-w-0">
+          <dt class="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+            Input
+          </dt>
+          <dd class="mt-1 truncate font-mono text-xs text-zinc-300 sm:text-sm">
+            DBML
+          </dd>
         </div>
+        <div class="min-w-0">
+          <dt class="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+            Outputs
+          </dt>
+          <dd class="mt-1 truncate font-mono text-xs text-zinc-300 sm:text-sm">
+            3 formats
+          </dd>
+        </div>
+        <div class="min-w-0">
+          <dt class="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+            Privacy
+          </dt>
+          <dd class="mt-1 truncate font-mono text-xs text-zinc-300 sm:text-sm">
+            100% client side
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="relative mx-auto w-full max-w-2xl lg:mx-0">
+      <div
+        class="absolute -inset-4 rounded-3xl bg-gradient-to-br from-accent/10 via-transparent to-prisma/10 blur-2xl"
+        aria-hidden="true"
+      ></div>
+
+      <div
+        class="relative overflow-hidden rounded-xl border border-zinc-700/80"
+      >
+        <header
+          class="flex min-w-0 flex-wrap items-center justify-between gap-3 border-b border-zinc-800 bg-zinc-900/90 px-4 py-3"
+        >
+          <div class="flex min-w-0 items-center gap-3">
+            <span class="truncate font-mono text-xs text-zinc-400"
+              >Web Browser</span
+            >
+          </div>
+        </header>
+
+        <div class="grid md:grid-cols-[minmax(0,1fr)_3rem_minmax(0,1fr)]">
+          <div
+            class="min-w-0 border-b p-4 md:border-b-0 border-inset border-zinc-900 bg-zinc-900/35"
+          >
+            <div class="mb-4 flex items-center justify-between gap-3">
+              <div class="flex min-w-0 items-center gap-2">
+                <span
+                  class="grid h-7 w-7 shrink-0 place-items-center rounded bg-accent/10 font-mono text-[10px] font-semibold text-accent"
+                  >DB</span
+                >
+                <div class="min-w-0">
+                  <p class="truncate font-mono text-xs text-zinc-200">
+                    schema.dbml
+                  </p>
+                  <p class="text-[11px] text-zinc-400">Your DBML schema</p>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="relative overflow-hidden rounded-md border border-border-muted bg-bg-secondary py-3 font-mono text-[11px] leading-6 sm:text-xs"
+              aria-label="Example DBML schema"
+            >
+              <div class="overflow-hidden pr-3">
+                @for (line of codeLines(); track line.number) {
+                  <div class="flex min-w-max leading-6">
+                    <span
+                      class="w-9 shrink-0 select-none pr-3 text-right text-zinc-500"
+                      aria-hidden="true"
+                    >
+                      {{ line.number }}
+                    </span>
+                    <code
+                      class="language-dbml whitespace-pre"
+                      [innerHTML]="line.content"
+                    ></code>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="relative hidden items-center justify-center border-inset border-r-4 border-zinc-900 bg-zinc-900/35 md:flex"
+            aria-hidden="true"
+          >
+            <span
+              class="relative grid h-8 w-8 place-items-center rounded-full border border-accent/30 text-accent"
+            >
+              <arrow-right-icon className="h-4 w-4"></arrow-right-icon>
+            </span>
+          </div>
+
+          <div class="min-w-0 p-4 bg-zinc-900/35">
+            <div class="mb-8 flex items-center justify-between gap-3">
+              <div>
+                <p class="font-mono text-xs text-zinc-200">Generated files</p>
+              </div>
+            </div>
+
+            <div class="space-y-2.5">
+              <div
+                class="group flex items-center gap-3 rounded-md border border-json/25 bg-json/5 p-3 transition hover:border-json/50 hover:bg-json/10"
+              >
+                <span
+                  class="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded border border-json/25 bg-json/10"
+                >
+                  <img
+                    src="images/json-badge.png"
+                    width="200"
+                    height="200"
+                    alt=""
+                    class="h-7 w-7 object-contain"
+                  />
+                </span>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate font-mono text-xs text-zinc-200">
+                    schema.json
+                  </p>
+                  <p class="mt-0.5 text-[11px] text-zinc-500">
+                    Portable structure
+                  </p>
+                </div>
+                <span class="h-1.5 w-1.5 rounded-full bg-json"></span>
+              </div>
+
+              <div
+                class="group flex items-center gap-3 rounded-md border border-prisma/25 bg-prisma/5 p-3 transition hover:border-prisma/50 hover:bg-prisma/10"
+              >
+                <span
+                  class="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded border border-prisma/25 bg-prisma/10"
+                >
+                  <img
+                    src="images/prisma-badge.png"
+                    width="200"
+                    height="200"
+                    alt=""
+                    class="h-7 w-7 object-contain brightness-0 invert opacity-80"
+                  />
+                </span>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate font-mono text-xs text-zinc-200">
+                    schema.prisma
+                  </p>
+                  <p class="mt-0.5 text-[11px] text-zinc-500">Prisma models</p>
+                </div>
+                <span class="h-1.5 w-1.5 rounded-full bg-prisma"></span>
+              </div>
+
+              <div
+                class="group flex items-center gap-3 rounded-md border border-typeorm/25 bg-typeorm/5 p-3 transition hover:border-typeorm/50 hover:bg-typeorm/10"
+              >
+                <span
+                  class="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded border border-typeorm/25 bg-typeorm/10"
+                >
+                  <img
+                    src="images/typeorm-badge.png"
+                    width="200"
+                    height="200"
+                    alt=""
+                    class="h-7 w-7 rounded-sm object-contain"
+                  />
+                </span>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate font-mono text-xs text-zinc-200">
+                    users.entity.ts
+                  </p>
+                  <p class="mt-0.5 text-[11px] text-zinc-500">
+                    TypeORM entities
+                  </p>
+                </div>
+                <span class="h-1.5 w-1.5 rounded-full bg-typeorm"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <footer
+          class="flex flex-wrap items-center justify-end gap-3 border-t border-zinc-800 bg-zinc-900/70 px-4 py-3 text-xs"
+        >
+          <span class="flex items-center gap-1 text-accent">
+            <span class="inline-block h-2 w-2 rounded-full bg-accent"></span>
+            No problems detected.
+          </span>
+        </footer>
       </div>
     </div>
   </main>
-</div>
+</section>

@@ -1,0 +1,36 @@
+Table users {
+  id bigint [pk]
+}
+
+Table service_accounts {
+  id bigint [pk]
+}
+
+Table projects {
+  id bigint [pk]
+  owner_id bigint [not null, ref: > users.id]
+}
+
+Table documents {
+  id bigint [pk]
+  project_id bigint [not null, ref: > projects.id]
+  created_by bigint [not null, ref: > users.id]
+  updated_by bigint [not null, ref: > users.id]
+  approved_by bigint [ref: > users.id]
+}
+
+Table comments {
+  id bigint [pk]
+  document_id bigint [not null, ref: > documents.id]
+  author_id bigint [not null, ref: > users.id]
+}
+
+Table audit_events {
+  id bigint [pk]
+  actor_id bigint [not null]
+  subject_user_id bigint [ref: > users.id]
+  project_id bigint [ref: > projects.id]
+}
+
+Ref: audit_events.actor_id > users.id
+Ref: audit_events.actor_id > service_accounts.id

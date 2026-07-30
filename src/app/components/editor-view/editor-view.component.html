@@ -2,11 +2,11 @@
   <!-- layout: editor -->
   <div class="flex flex-col sm:flex-row h-full w-full">
     <!-- files and folders -->
-    <aside class="sm:w-[360px] sm:border-r border-border-muted">
+    <aside class="shrink-0 sm:w-[360px] sm:border-r border-border-muted">
       <ng-content select="[editor-explorer]"></ng-content>
     </aside>
 
-    <section class="flex-1">
+    <section class="min-w-0 flex-1">
       <!-- editor/code area -->
       <ng-content select="[editor-area]"></ng-content>
     </section>

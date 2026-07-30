@@ -1,0 +1,37 @@
+Enum order_status {
+  pending
+  paid
+  cancelled
+}
+
+Table users {
+  id uuid [pk]
+  email varchar(255) [not null, unique]
+  manager_id uuid [ref: > users.id]
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table products {
+  id int [pk, increment]
+  sku varchar(64) [not null, unique]
+  price decimal(10,2) [not null]
+}
+
+Table orders {
+  id uuid [pk]
+  customer_id uuid [not null, ref: > users.id]
+  status order_status [not null, default: 'pending']
+  total decimal(10,2) [not null]
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table order_items {
+  order_id uuid [not null, ref: > orders.id, delete: cascade]
+  product_id int [not null, ref: > products.id]
+  quantity int [not null, default: 1]
+
+  indexes {
+    (order_id, product_id) [pk, name: 'pk_order_items']
+    product_id [name: 'idx_order_items_product']
+  }
+}

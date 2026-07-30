@@ -3,12 +3,11 @@ import {
   ElementRef,
   viewChild,
   signal,
-  effect,
   WritableSignal,
   computed,
   input,
   model,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
@@ -39,7 +38,7 @@ export class DbmlCodeEditorComponent {
 
   editorTextarea = viewChild<ElementRef<HTMLTextAreaElement>>('editorTextarea');
 
-  highlighted: WritableSignal<string> = signal('');
+  highlighted = computed(() => this.prism.highlight(this.code()));
   scrollTop: WritableSignal<number> = signal(0);
   scrollLeft: WritableSignal<number> = signal(0);
 
@@ -51,49 +50,68 @@ export class DbmlCodeEditorComponent {
     }));
   });
 
-  constructor(private prism: PrismService) {
-    effect(() => {
-      this.highlightCode();
-    });
-  }
+  constructor(private prism: PrismService) {}
 
   /*
   Sync scroll positions (X and Y) between the textarea and the highlighted code display.
   */
   handleScroll(): void {
-    if (!this.editorTextarea()?.nativeElement) return;
-
-    const textarea = this.editorTextarea()!.nativeElement;
+    const textarea = this.editorTextarea()?.nativeElement;
+    if (!textarea) return;
     this.scrollTop.set(textarea.scrollTop);
     this.scrollLeft.set(textarea.scrollLeft);
   }
 
   onKeyDown(event: KeyboardEvent) {
-    if (event.key === 'Tab') {
-      event.preventDefault();
+    if (event.key !== 'Tab') return;
+    event.preventDefault();
 
-      if (!this.code()) {
-        this.code.set(this.placeholder());
-        return;
-      }
-
-      /* Handle tab insertion */
-      const textarea = event.target as HTMLTextAreaElement;
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const tabChar = '\t';
-
-      const newValue =
-        this.code().substring(0, start) + tabChar + this.code().substring(end);
-
-      this.code.set(newValue);
-      textarea.value = newValue;
-
-      textarea.selectionStart = textarea.selectionEnd = start + tabChar.length;
+    if (!this.code()) {
+      this.code.set(this.placeholder());
+      return;
     }
+
+    /* Handle tab insertion */
+    const textarea = event.target as HTMLTextAreaElement;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const tabChar = '\t';
+
+    const newValue =
+      this.code().substring(0, start) + tabChar + this.code().substring(end);
+
+    this.code.set(newValue);
+    textarea.value = newValue;
+
+    textarea.selectionStart = textarea.selectionEnd = start + tabChar.length;
   }
 
-  private highlightCode(): void {
-    this.highlighted.set(this.prism.highlight(this.code()));
+  /*
+    Move the caret to a 1-based source line, select it and scroll it into
+    view. Used by the diagnostics panel to navigate to a problem.
+  */
+  scrollToLine(line: number): void {
+    const textarea = this.editorTextarea()?.nativeElement;
+    if (!textarea) return;
+
+    const lines = this.code().split('\n');
+    const targetLine = Math.min(Math.max(line, 1), lines.length);
+
+    // Character offset of the target line start
+    let offset = 0;
+    for (let i = 0; i < targetLine - 1; i++) {
+      offset += lines[i].length + 1; // +1 for the newline
+    }
+
+    textarea.focus();
+    textarea.setSelectionRange(
+      offset,
+      offset + (lines[targetLine - 1]?.length ?? 0),
+    );
+
+    // Approximate vertical scroll so the line sits near the top
+    const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight) || 20;
+    textarea.scrollTop = Math.max(0, (targetLine - 3) * lineHeight);
+    this.handleScroll();
   }
 }

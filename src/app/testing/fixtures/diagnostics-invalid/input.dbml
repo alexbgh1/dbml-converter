@@ -1,0 +1,9 @@
+Table customers {
+  customer_uuid uuid [pk]
+}
+
+Table orders {
+  id int [pk]
+  customer_id int [ref: > customers.id]
+  location geography
+}

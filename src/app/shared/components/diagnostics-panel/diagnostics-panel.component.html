@@ -1,0 +1,317 @@
+<div class="rounded border border-border-muted bg-bg-secondary text-xs">
+  <div class="flex items-stretch">
+    <button
+      type="button"
+      class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded px-3 py-2 focus-visible:outline-2 focus-visible:outline-accent"
+      (click)="toggleExpanded()"
+      [attr.aria-expanded]="expanded()"
+      aria-controls="diagnostics-list"
+    >
+      @if (hasProblems()) {
+        <span class="flex items-center gap-1 text-red-400">
+          <span class="inline-block h-2 w-2 rounded-full bg-red-400"></span>
+          {{ errors().length }}
+          {{ errors().length === 1 ? "error" : "errors" }}
+        </span>
+        <span class="flex items-center gap-1 text-amber-400">
+          <span class="inline-block h-2 w-2 rounded-full bg-amber-400"></span>
+          {{ warnings().length }}
+          {{ warnings().length === 1 ? "warning" : "warnings" }}
+        </span>
+      } @else {
+        <span class="flex items-center gap-1 text-accent">
+          <span class="inline-block h-2 w-2 rounded-full bg-accent"></span>
+          No problems detected.
+        </span>
+      }
+
+      <span class="ml-auto flex items-center text-text-muted">
+        @if (expanded()) {
+          <chevron-down-icon className="h-4 w-4"></chevron-down-icon>
+        } @else {
+          <chevron-right-icon className="h-4 w-4"></chevron-right-icon>
+        }
+      </span>
+    </button>
+
+    @if (infos().length > 0) {
+      <button
+        type="button"
+        class="shrink-0 cursor-pointer rounded px-3 py-2 text-text-muted underline decoration-dotted hover:text-text focus-visible:outline-2 focus-visible:outline-accent"
+        (click)="toggleInfo()"
+        [attr.aria-pressed]="showInfo()"
+      >
+        {{ showInfo() ? "hide" : "show" }} {{ infos().length }} info
+      </button>
+    }
+  </div>
+
+  @if (state().freshness === "pending-validation") {
+    <div
+      class="border-t border-amber-500/30 bg-amber-500/5 px-3 py-2 text-amber-200"
+      role="status"
+    >
+      Outdated — Convert to refresh diagnostics and generated output.
+    </div>
+  }
+
+  @if (expanded()) {
+    <div
+      id="diagnostics-list"
+      class="max-h-56 overflow-auto border-t border-border-muted bg-code-box-bg"
+    >
+      @for (group of visibleGroups(); track group.label) {
+        <div class="px-3 py-2">
+          <div
+            class="mb-1 uppercase tracking-wide"
+            [class.text-red-400]="group.kind === 'error'"
+            [class.text-amber-400]="group.kind === 'warning'"
+            [class.text-sky-400]="group.kind === 'info'"
+          >
+            {{ group.label }}
+          </div>
+
+          <ul class="space-y-1">
+            @for (item of group.items; track item.id) {
+              @let diagnostic = item.diagnostic;
+              <li
+                class="flex min-w-0 items-center gap-1 rounded px-1 py-0.5 hover:bg-bg-primary"
+              >
+                <span
+                  class="h-1.5 w-1.5 shrink-0 rounded-full"
+                  [class.bg-red-400]="diagnostic.severity === 'error'"
+                  [class.bg-amber-400]="diagnostic.severity === 'warning'"
+                  [class.bg-sky-400]="diagnostic.severity === 'info'"
+                  aria-hidden="true"
+                ></span>
+                <code
+                  class="min-w-0 flex-1 truncate font-mono text-[11px] text-zinc-300"
+                  [title]="diagnostic.code"
+                  >{{ diagnostic.code }}</code
+                >
+                <button
+                  type="button"
+                  class="shrink-0 rounded p-1 text-text-muted hover:bg-bg-tertiary hover:text-text focus-visible:outline-2 focus-visible:outline-accent"
+                  (click)="openDetails(item)"
+                  [attr.aria-label]="'View details for ' + diagnostic.code"
+                  title="View diagnostic details"
+                >
+                  <info-icon className="h-4 w-4"></info-icon>
+                </button>
+                <button
+                  type="button"
+                  class="shrink-0 rounded p-1 text-accent hover:bg-accent/10 focus-visible:outline-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:text-zinc-700 disabled:hover:bg-transparent"
+                  [disabled]="repairDisabled(item)"
+                  (click)="openRepairConfirmation(item)"
+                  [attr.aria-label]="
+                    diagnostic.repairs?.length
+                      ? 'Repair ' + diagnostic.code
+                      : 'No repair available for ' + diagnostic.code
+                  "
+                  [title]="repairTitle(item)"
+                >
+                  <wrench-icon className="h-4 w-4"></wrench-icon>
+                </button>
+                @if (isAffectedByActivity(item)) {
+                  <span
+                    class="shrink-0 rounded bg-accent/10 px-1.5 py-0.5 text-[9px] uppercase tracking-wide text-accent"
+                  >
+                    {{ state().repairActivity?.status }}
+                  </span>
+                }
+              </li>
+            }
+          </ul>
+        </div>
+      }
+      @if (visibleGroups().length === 0) {
+        <div class="bg-code-box-bg px-3 py-2 text-text-muted">
+          Nothing to show.
+        </div>
+      }
+    </div>
+  }
+
+  @if (state().repairActivity; as activity) {
+    <div class="space-y-2 border-t border-border-muted bg-bg-primary px-3 py-3">
+      <div class="flex flex-wrap items-center gap-2">
+        <span
+          class="rounded px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide"
+          [class.bg-amber-500/10]="activity.status === 'pending-validation'"
+          [class.text-amber-300]="activity.status === 'pending-validation'"
+          [class.bg-accent/10]="activity.status === 'resolved'"
+          [class.text-accent]="activity.status === 'resolved'"
+          [class.bg-red-500/10]="activity.status === 'still-present'"
+          [class.text-red-300]="activity.status === 'still-present'"
+        >
+          @switch (activity.status) {
+            @case ("pending-validation") {
+              Pending validation
+            }
+            @case ("resolved") {
+              Resolved
+            }
+            @case ("still-present") {
+              Still present
+            }
+          }
+        </span>
+        <span class="text-zinc-200">{{ activity.repair.label }}</span>
+      </div>
+
+      <div class="space-y-1 rounded border border-border-muted p-2 font-mono">
+        <div class="break-all text-red-300/80">
+          &minus; {{ activity.repair.expectedText }}
+        </div>
+        <div class="break-all text-accent/80">
+          + {{ activity.repair.replacementText }}
+        </div>
+        <div class="text-[10px] text-text-muted">
+          {{ activity.diagnostic.code }} · Line {{ activity.repair.line }}
+          @if (activity.resolvedDiagnosticCount > 1) {
+            · {{ activity.resolvedDiagnosticCount }} diagnostics resolved
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <button
+          type="button"
+          class="cursor-pointer rounded border border-border-muted px-2 py-1 text-text-muted hover:text-text disabled:cursor-not-allowed disabled:opacity-40"
+          [disabled]="!state().canUndo"
+          (click)="undo.emit()"
+        >
+          Undo
+        </button>
+        @if (activity.status === "pending-validation") {
+          <button
+            type="button"
+            class="cursor-pointer rounded bg-accent/60 px-2 py-1 text-white"
+            (click)="validate.emit()"
+          >
+            Convert to validate
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  @if (state().repairFailure; as failure) {
+    <div
+      class="border-t border-red-500/30 bg-red-500/5 px-3 py-2 text-red-300"
+      role="alert"
+    >
+      {{ failure.message }}
+    </div>
+  }
+</div>
+
+@if (detailItem(); as item) {
+  @let diagnostic = item.diagnostic;
+  <app-action-dialog
+    [open]="true"
+    title="Diagnostic details"
+    [primaryLabel]="
+      diagnostic.line !== undefined ? 'Go to line ' + diagnostic.line : 'Close'
+    "
+    [secondaryLabel]="diagnostic.line !== undefined ? 'Close' : null"
+    (primary)="
+      diagnostic.line !== undefined ? navigateFromDetails(item) : closeDetails()
+    "
+    (secondary)="closeDetails()"
+    (dismissed)="closeDetails()"
+  >
+    <div class="space-y-4">
+      <div class="flex flex-wrap items-center gap-2">
+        <span
+          class="rounded px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide"
+          [class.bg-red-500/10]="diagnostic.severity === 'error'"
+          [class.text-red-300]="diagnostic.severity === 'error'"
+          [class.bg-amber-500/10]="diagnostic.severity === 'warning'"
+          [class.text-amber-300]="diagnostic.severity === 'warning'"
+          [class.bg-sky-500/10]="diagnostic.severity === 'info'"
+          [class.text-sky-300]="diagnostic.severity === 'info'"
+        >
+          {{ diagnostic.severity }}
+        </span>
+        <code class="break-all font-mono text-xs text-zinc-200">{{
+          diagnostic.code
+        }}</code>
+      </div>
+
+      <dl class="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-2">
+        <dt class="text-text-muted">Problem</dt>
+        <dd class="min-w-0 break-words">{{ diagnostic.message }}</dd>
+
+        @if (diagnostic.suggestion) {
+          <dt class="text-text-muted">Suggestion</dt>
+          <dd class="min-w-0 break-words">{{ diagnostic.suggestion }}</dd>
+        }
+
+        <dt class="text-text-muted">Phase</dt>
+        <dd>{{ diagnostic.phase }}</dd>
+
+        @if (diagnostic.target) {
+          <dt class="text-text-muted">Target</dt>
+          <dd>{{ diagnostic.target }}</dd>
+        }
+
+        @if (diagnostic.line !== undefined) {
+          <dt class="text-text-muted">Line</dt>
+          <dd>{{ diagnostic.line }}</dd>
+        }
+
+        @if (diagnostic.schemaPath) {
+          <dt class="self-center text-text-muted">Schema path</dt>
+          <dd class="min-w-0 self-center break-all font-mono text-xs">
+            {{ diagnostic.schemaPath }}
+          </dd>
+        }
+      </dl>
+    </div>
+  </app-action-dialog>
+}
+
+@if (repairItem(); as item) {
+  @let diagnostic = item.diagnostic;
+  <app-action-dialog
+    [open]="true"
+    title="Confirm repair"
+    primaryLabel="Apply repair"
+    secondaryLabel="Cancel"
+    [primaryDisabled]="!selectedRepair()"
+    (primary)="confirmRepair()"
+    (secondary)="closeRepairConfirmation()"
+    (dismissed)="closeRepairConfirmation()"
+  >
+    <p class="mb-4 text-text-muted">
+      Review the guarded source edit before applying it. You can undo a
+      successful repair afterward.
+    </p>
+
+    <div class="space-y-2">
+      @for (repair of diagnostic.repairs ?? []; track $index) {
+        <button
+          type="button"
+          class="w-full rounded border p-3 text-left focus-visible:outline-2 focus-visible:outline-accent"
+          [class.border-accent]="selectedRepair() === repair"
+          [class.bg-accent/5]="selectedRepair() === repair"
+          [class.border-border-muted]="selectedRepair() !== repair"
+          (click)="selectedRepair.set(repair)"
+          [attr.aria-pressed]="selectedRepair() === repair"
+        >
+          <span class="block text-sm text-zinc-200">{{ repair.label }}</span>
+          <span class="mt-2 block break-all font-mono text-xs text-red-300/80">
+            &minus; {{ repair.expectedText }}
+          </span>
+          <span class="mt-1 block break-all font-mono text-xs text-accent/80">
+            + {{ repair.replacementText }}
+          </span>
+          <span class="mt-2 block text-[10px] text-text-muted">
+            Line {{ repair.line }}
+          </span>
+        </button>
+      }
+    </div>
+  </app-action-dialog>
+}

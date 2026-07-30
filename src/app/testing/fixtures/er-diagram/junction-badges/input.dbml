@@ -1,0 +1,27 @@
+Table accounts {
+  id bigint [pk]
+}
+
+Table roles {
+  id bigint [pk]
+}
+
+Table assignment_registry {
+  id uuid [pk]
+}
+
+Table account_role_assignments {
+  account_id bigint [not null, ref: > accounts.id]
+  role_id bigint [not null, ref: > roles.id]
+  tenant_id bigint [not null]
+  assignment_code varchar(80) [not null]
+  assignment_uuid uuid [not null, unique, ref: > assignment_registry.id]
+  created_at timestamp [not null]
+
+  indexes {
+    (account_id, role_id) [pk, name: 'pk_account_role_assignments']
+    (tenant_id, assignment_code) [unique, name: 'uq_assignment_tenant_code']
+  }
+}
+
+Ref account_role_assignments: accounts.id <> roles.id

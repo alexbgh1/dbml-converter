@@ -9,8 +9,6 @@ const OUTPUT_OPTIONS_MAP: Record<OutputOption, OutputOption> = {
   prisma: 'prisma',
 } as const;
 
-const OUTPUT_OPTIONS_ARRAY = Object.values(OUTPUT_OPTIONS_MAP);
-
 const OUTPUT_TYPES: Record<OutputOption, OutputType> = {
   // Json as Light Blue
   json: {
@@ -38,14 +36,8 @@ const OUTPUT_TYPES: Record<OutputOption, OutputType> = {
   },
 };
 
-const INPUT_CODE_EDITOR_OPTIONS = {
-  language: 'dbml',
-  height: '400px',
-};
+const OUTPUT_TYPE_OPTIONS: readonly OutputType[] = Object.freeze(
+  Object.values(OUTPUT_TYPES),
+);
 
-export {
-  OUTPUT_OPTIONS_MAP,
-  OUTPUT_OPTIONS_ARRAY,
-  OUTPUT_TYPES,
-  INPUT_CODE_EDITOR_OPTIONS,
-};
+export { OUTPUT_OPTIONS_MAP, OUTPUT_TYPE_OPTIONS, OUTPUT_TYPES };

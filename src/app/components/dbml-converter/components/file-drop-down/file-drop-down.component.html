@@ -13,48 +13,53 @@
         ? 'rounded-t-lg border-b border-accent bg-accent/10'
         : 'rounded-lg  bg-bg-secondary'
     "
-    class="w-full px-4 py-3 flex items-center justify-between text-left"
+    class="flex w-full items-center gap-2 px-4 py-3 text-left"
   >
     <!-- Left Section: File name, chars length -->
-    <section class="flex items-center gap-2">
+    <section class="flex min-w-0 flex-1 items-center gap-2">
       <!-- Chevron Icons -->
       @if (isOpen()) {
-      <chevron-down-icon
-        [class]="isOpen() ? '[&>svg]:text-accent' : ''"
-        className="w-5 h-5 text-text-muted mr-2"
-      ></chevron-down-icon>
+        <chevron-down-icon
+          [class]="
+            isOpen() ? 'shrink-0 [&>svg]:text-accent' : 'shrink-0'
+          "
+          className="w-5 h-5 shrink-0 text-text-muted mr-2"
+        ></chevron-down-icon>
       } @else {
-
-      <chevron-right-icon
-        className="w-5 h-5 text-text-muted mr-2"
-      ></chevron-right-icon>
+        <chevron-right-icon
+          class="shrink-0"
+          className="w-5 h-5 shrink-0 text-text-muted mr-2"
+        ></chevron-right-icon>
       }
 
       <!-- File Name -->
-      <div class="flex items-center">
+      <div class="flex min-w-0 flex-1 items-center">
         <file-icon
-          [class]="isOpen() ? '[&>svg]:text-accent' : ''"
-          className="w-4 h-4 text-text-muted mr-2"
+          [class]="
+            isOpen() ? 'shrink-0 [&>svg]:text-accent' : 'shrink-0'
+          "
+          className="w-4 h-4 shrink-0 text-text-muted mr-2"
         ></file-icon>
         <span
           [class]="isOpen() ? 'font-medium text-text' : 'text-text-muted'"
-          class="font-mono text-sm"
+          class="min-w-0 truncate font-mono text-sm"
         >
           {{ fileName }}
         </span>
       </div>
 
-      <!-- Chars count -->
-      <div class="flex items-center gap-2">
+      <!-- Lines (primary) + chars (secondary) count -->
+      <div class="flex shrink-0 items-center gap-2">
         <span
           class="text-text-muted inline-flex items-center justify-center rounded-md border px-2 py-0.5 font-medium w-fit whitespace-nowrap shrink-0 overflow-hidden ml-2 text-xs border-border-muted"
-          >{{ charsCount }} chars</span
+          >{{ linesCount }} lines
+          <span class="opacity-60 ml-1">· {{ charsCount }} ch</span></span
         >
       </div>
     </section>
 
     <!-- Right Section: Copy & Download -->
-    <section class="flex gap-1">
+    <section class="flex shrink-0 gap-1">
       <!-- Copy Button -->
       <copy-file-button [textToCopy]="codeContent"></copy-file-button>
 
@@ -68,13 +73,13 @@
 
   <!-- Code Viewer -->
   @if (isOpen()) {
-  <div class="px-4 py-3 bg-accent/5">
-    <ng-content>
-      <app-code-viewer
-        [code]="codeContent"
-        [height]="'200px'"
-      ></app-code-viewer>
-    </ng-content>
-  </div>
+    <div class="px-4 py-3 bg-accent/5">
+      <ng-content>
+        <app-code-viewer
+          [code]="codeContent"
+          [height]="'200px'"
+        ></app-code-viewer>
+      </ng-content>
+    </div>
   }
 </div>

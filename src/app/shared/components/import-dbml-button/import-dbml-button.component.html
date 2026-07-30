@@ -1,0 +1,25 @@
+<input
+  #fileInput
+  type="file"
+  [accept]="DBML_FILE_EXTENSION + ',text/plain'"
+  class="sr-only"
+  (change)="onFileSelected($event)"
+/>
+<button
+  type="button"
+  class="text-xs text-accent hover:underline disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-accent"
+  [disabled]="isReading()"
+  (click)="chooseFile()"
+>
+  {{ isReading() ? "Reading…" : "Import " + DBML_FILE_EXTENSION }}
+</button>
+@if (status()) {
+  <span
+    class="block mt-1 text-xs"
+    [class.text-red-400]="isError()"
+    [class.text-text-muted]="!isError()"
+    [attr.role]="isError() ? 'alert' : 'status'"
+  >
+    {{ status() }}
+  </span>
+}

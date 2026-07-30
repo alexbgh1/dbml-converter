@@ -1,4 +1,9 @@
-import { Component, Input, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  Input,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import {
   ChevronRightIconComponent,
   ChevronDownIconComponent,
@@ -26,6 +31,7 @@ import { DownloadFileButtonComponent } from '../../../../shared/components/downl
 export class FileDropDownComponent {
   @Input() fileName: string = 'file.txt';
   @Input() charsCount: number = 0;
+  @Input() linesCount: number = 0;
   @Input() codeContent: string = '';
 
   isOpen = signal(false);

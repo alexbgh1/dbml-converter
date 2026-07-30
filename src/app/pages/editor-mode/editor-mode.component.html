@@ -9,143 +9,176 @@
     >
       <h2 class="py-2 text-sm font-medium text-zinc-300 px-4">Explorer</h2>
       <!-- Convert / Clear actions -->
-      <div class="flex gap-2 mr-2">
-        <button
-          (click)="handleConvert()"
-          class="flex items-center gap-2 cursor-pointer px-2 bg-accent/60 text-white rounded disabled:cursor-not-allowed disabled:opacity-50"
-          [disabled]="isConverting()"
-        >
-          Convert
-        </button>
-        <button
-          (click)="clearAll()"
-          class="cursor-pointer px-2 rounded text-text-muted hover:text-text"
-        >
-          Clear
-        </button>
+      <div class="mr-2">
+        <!-- TODO: Consider future release -->
+        <!-- <app-import-dbml-button
+          [hasExistingContent]="!!dbmlContent().trim()"
+          (imported)="importDbml($event)"
+        ></app-import-dbml-button> -->
+        <app-dbml-conversion-actions
+          [isConverting]="isConverting()"
+          (convertRequested)="handleConvert()"
+          (clearRequested)="clearAll()"
+        ></app-dbml-conversion-actions>
       </div>
     </div>
 
-    <!-- Output type selector in editor mode -->
+    <!-- Output type selector in Files View -->
     <div class="mt-4 px-4">
       <label class="text-xs font-medium text-text-muted block mb-2"
         >Output format:</label
       >
       <app-expanding-circle-button
-        [options]="expandingButtonOptions()"
+        [options]="expandingButtonOptions"
         [selectedId]="selectedOutputType()"
         (optionSelected)="setOutputType($event)"
       ></app-expanding-circle-button>
     </div>
 
+    @if (diagnosticsState().freshness !== "not-converted") {
+      <div class="mt-3 px-4">
+        <app-diagnostics-panel
+          [state]="diagnosticsState()"
+          (navigate)="goToLine($event)"
+          (repair)="applyRepair($event)"
+          (undo)="undoRepair()"
+          (validate)="handleConvert()"
+        ></app-diagnostics-panel>
+      </div>
+    }
+
     <div class="flex-1 overflow-auto p-2 px-3">
       <!-- Input folder -->
       <div class="mb-2">
-        <div
-          class="flex items-center gap-1 px-2 py-1 hover:bg-bg-secondary rounded cursor-pointer"
-          (click)="toggleFolder('input')"
+        <button
+          type="button"
+          class="flex w-full items-center gap-1 px-2 py-1 hover:bg-bg-secondary rounded cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-accent"
+          (click)="toggleFolder(INPUT_FOLDER_ID)"
+          [attr.aria-expanded]="expandedFolders().has(INPUT_FOLDER_ID)"
+          aria-controls="editor-input-files"
         >
-          @if (expandedFolders().has('input')) {
-          <open-folder-icon
-            className="w-4 h-4 mr-2"
-            [class]="
-              expandedFolders().has('input') ? 'text-text' : 'text-text-muted'
-            "
-          ></open-folder-icon>
+          @if (expandedFolders().has(INPUT_FOLDER_ID)) {
+            <open-folder-icon
+              className="w-4 h-4 mr-2"
+              [class]="
+                expandedFolders().has(INPUT_FOLDER_ID)
+                  ? 'text-text'
+                  : 'text-text-muted'
+              "
+            ></open-folder-icon>
           }
           <!--  -->
           @else {
-          <folder-icon className="w-4 h-4 text-text-muted mr-2"></folder-icon>
+            <folder-icon className="w-4 h-4 text-text-muted mr-2"></folder-icon>
           }
           <span
             class="text-sm"
-            [class.text-text]="expandedFolders().has('input')"
-            [class.text-zinc-300]="!expandedFolders().has('input')"
+            [class.text-text]="expandedFolders().has(INPUT_FOLDER_ID)"
+            [class.text-zinc-300]="!expandedFolders().has(INPUT_FOLDER_ID)"
             >input</span
           >
-        </div>
+        </button>
 
-        @if (expandedFolders().has('input')) {
-        <div class="ml-6">
-          <div
-            class="flex items-center gap-2 px-2 py-1 hover:bg-bg-secondary rounded cursor-pointer"
-            [class.bg-bg-secondary]="selectedFile() === null"
-            (click)="selectFileInEditor(null)"
-          >
-            <file-icon
-              [class.text-text-muted]="selectedFile() !== null"
-              [class.text-accent]="selectedFile() === null"
-              className="w-4 h-4 mr-2"
-            ></file-icon>
-
-            <span
-              [class.text-accent]="selectedFile() === null"
-              [class.text-zinc-300]="selectedFile() !== null"
-              class="text-sm"
-              >input.txt</span
+        @if (expandedFolders().has(INPUT_FOLDER_ID)) {
+          <div id="editor-input-files" class="ml-6">
+            <button
+              type="button"
+              class="flex w-full items-center gap-2 px-2 py-1 hover:bg-bg-secondary rounded cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-accent"
+              [class.bg-bg-secondary]="selectedFile() === null"
+              (click)="selectFileInEditor(null)"
+              [attr.aria-current]="selectedFile() === null ? 'page' : null"
             >
+              <file-icon
+                [class.text-text-muted]="selectedFile() !== null"
+                [class.text-accent]="selectedFile() === null"
+                className="w-4 h-4 mr-2"
+              ></file-icon>
+
+              <span
+                [class.text-accent]="selectedFile() === null"
+                [class.text-zinc-300]="selectedFile() !== null"
+                class="text-sm"
+                >{{ DBML_INPUT_FILE.filename }}</span
+              >
+            </button>
           </div>
-        </div>
         }
       </div>
 
       <!-- Output folder -->
       @if (files().length > 0) {
-      <div class="mb-2">
-        <div
-          class="flex items-center gap-1 px-2 py-1 hover:bg-bg-secondary rounded cursor-pointer"
-          (click)="toggleFolder('output')"
-        >
-          @if (expandedFolders().has('output')) {
-          <open-folder-icon
-            [class.text-text]="expandedFolders().has('output')"
-            [class.text-text-muted]="!expandedFolders().has('output')"
-            className="w-4 h-4 mr-2"
-          ></open-folder-icon>
-          }
-          <!--  -->
-          @else {
-          <folder-icon className="w-4 h-4 text-text-muted mr-2"></folder-icon>
-          }
-
-          <span
-            class="text-sm"
-            [class.text-text]="expandedFolders().has('output')"
-            [class.text-zinc-300]="!expandedFolders().has('output')"
-            >output</span
+        <div class="mb-2">
+          <button
+            type="button"
+            class="flex w-full items-center gap-1 px-2 py-1 hover:bg-bg-secondary rounded cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-accent"
+            (click)="toggleFolder(OUTPUT_FOLDER_ID)"
+            [attr.aria-expanded]="expandedFolders().has(OUTPUT_FOLDER_ID)"
+            aria-controls="editor-output-files"
           >
-          <span class="ml-auto text-xs text-text-muted">{{
-            files().length
-          }}</span>
-        </div>
+            @if (expandedFolders().has(OUTPUT_FOLDER_ID)) {
+              <open-folder-icon
+                [class.text-text]="expandedFolders().has(OUTPUT_FOLDER_ID)"
+                [class.text-text-muted]="
+                  !expandedFolders().has(OUTPUT_FOLDER_ID)
+                "
+                className="w-4 h-4 mr-2"
+              ></open-folder-icon>
+            }
+            <!--  -->
+            @else {
+              <folder-icon
+                className="w-4 h-4 text-text-muted mr-2"
+              ></folder-icon>
+            }
 
-        @if (expandedFolders().has('output')) {
-        <div class="ml-6 space-y-1">
-          @for (file of files(); track file.id) {
-          <div
-            class="flex items-center gap-2 px-2 py-1 hover:bg-bg-secondary rounded cursor-pointer"
-            [class.bg-bg-secondary]="selectedFile()?.id === file.id"
-            (click)="selectFileInEditor(file)"
-          >
-            <file-icon
-              [class.text-text-muted]="selectedFile()?.id !== file.id"
-              [class.text-accent]="selectedFile()?.id === file.id"
-              className="w-4 h-4 mr-2"
-            ></file-icon>
             <span
               class="text-sm"
-              [class.text-zinc-300]="selectedFile()?.id !== file.id"
-              [class.text-accent]="selectedFile()?.id === file.id"
-              >{{ file.filename }}</span
+              [class.text-text]="expandedFolders().has(OUTPUT_FOLDER_ID)"
+              [class.text-zinc-300]="!expandedFolders().has(OUTPUT_FOLDER_ID)"
+              >output</span
             >
             <span class="ml-auto text-xs text-text-muted">{{
-              file.content | codeChars
+              files().length
             }}</span>
-          </div>
+          </button>
+
+          @if (expandedFolders().has(OUTPUT_FOLDER_ID)) {
+            <div id="editor-output-files" class="ml-6 space-y-1">
+              @for (file of files(); track file.id) {
+                <button
+                  type="button"
+                  class="flex min-w-0 w-full items-center gap-2 px-2 py-1 hover:bg-bg-secondary rounded cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-accent"
+                  [class.bg-bg-secondary]="selectedFile()?.id === file.id"
+                  (click)="selectFileInEditor(file)"
+                  [attr.aria-current]="
+                    selectedFile()?.id === file.id ? 'page' : null
+                  "
+                >
+                  <file-icon
+                    [class.text-text-muted]="selectedFile()?.id !== file.id"
+                    [class.text-accent]="selectedFile()?.id === file.id"
+                    class="shrink-0"
+                    className="w-4 h-4 mr-2"
+                  ></file-icon>
+                  <span
+                    class="min-w-0 flex-1 truncate text-sm"
+                    [class.text-zinc-300]="selectedFile()?.id !== file.id"
+                    [class.text-accent]="selectedFile()?.id === file.id"
+                    [title]="file.filename"
+                    >{{ file.filename }}</span
+                  >
+                  <span
+                    class="shrink-0 whitespace-nowrap text-xs text-text-muted"
+                    >{{ file.content | codeLines }} lines
+                    <span class="opacity-60"
+                      >· {{ file.content | codeChars }} ch</span
+                    ></span
+                  >
+                </button>
+              }
+            </div>
           }
         </div>
-        }
-      </div>
       }
       <div>
         <button
@@ -166,13 +199,23 @@
       <div
         class="border-y border-t-0 border-b border-border-muted bg-bg-secondary"
       >
-        <div class="flex">
+        <div class="flex min-w-0 overflow-hidden">
           <div
-            class="px-4 py-2 bg-zinc-900 border-r border-border-muted text-sm flex items-center gap-2"
+            class="flex min-w-0 max-w-full items-center gap-2 border-r border-border-muted bg-zinc-900 px-4 py-2 text-sm"
           >
-            <file-icon className="w-4 h-4 text-accent"></file-icon>
-            <span class="font-mono text-accent text-sm">
-              {{ selectedFile() ? selectedFile()?.filename : "input.txt" }}
+            <file-icon
+              class="shrink-0"
+              className="w-4 h-4 text-accent"
+            ></file-icon>
+            <span
+              class="min-w-0 truncate font-mono text-sm text-accent"
+              [title]="selectedFile()?.filename || DBML_INPUT_FILE.filename"
+            >
+              {{
+                selectedFile()
+                  ? selectedFile()?.filename
+                  : DBML_INPUT_FILE.filename
+              }}
             </span>
           </div>
         </div>
@@ -181,59 +224,61 @@
       <!-- Editor content -->
       <div class="flex-1 overflow-auto p-6">
         @if (selectedFile() === null) {
-        <!-- Input editor -->
-        <div class="h-full">
-          <app-dbml-code-editor
-            [code]="dbmlContent()"
-            [height]="'400px'"
-            (codeChange)="onDbmlInput($event)"
-          ></app-dbml-code-editor>
-
-          <div class="mt-2">
-            <button
-              class="text-xs text-accent hover:underline"
-              (click)="handleLoadExample()"
-            >
-              Load example DBML code
-            </button>
-          </div>
-        </div>
-        } @else {
-        <!-- Output file viewer -->
-        <div
-          class="h-full bg-bg-secondary border border-border-muted rounded-lg"
-        >
-          <div
-            class="flex items-center justify-between px-4 py-3 border-b border-border-muted"
-          >
-            <div class="flex items-center gap-2">
-              <span class="font-mono text-sm text-zinc-300">{{
-                selectedFile()?.filename
-              }}</span>
-              <span class="text-xs text-text-muted"
-                >{{ $safeNavigationMigration(selectedFile()?.content) | codeChars }} chars</span
-              >
-            </div>
-            <!-- Copy & Download buttons -->
-            <div class="flex gap-2">
-              <copy-file-button
-                [textToCopy]="selectedFile()?.content || ''"
-              ></copy-file-button>
-              <download-file-button
-                [textToDownload]="selectedFile()?.content || ''"
-                [fileName]="selectedFile()?.filename || 'file.txt'"
-              ></download-file-button>
-            </div>
-          </div>
-          <div class="p-4 h-full overflow-hidden">
-            <app-code-viewer
+          <!-- Input editor -->
+          <div class="h-full">
+            <app-dbml-code-editor
+              [code]="dbmlContent()"
               [height]="'400px'"
-              [code]="selectedFile()?.content || ''"
-              [language]="language()"
-            >
-            </app-code-viewer>
+              (codeChange)="onDbmlInput($event)"
+            ></app-dbml-code-editor>
+
+            <div class="mt-2">
+              <app-load-dbml-example-button
+                (loadRequested)="loadExample()"
+              ></app-load-dbml-example-button>
+            </div>
           </div>
-        </div>
+        } @else {
+          <!-- Output file viewer -->
+          <div
+            class="h-full bg-bg-secondary border border-border-muted rounded-lg"
+          >
+            <div
+              class="flex min-w-0 items-center gap-2 px-4 py-3 border-b border-border-muted"
+            >
+              <div class="flex min-w-0 flex-1 items-center gap-2">
+                <span
+                  class="min-w-0 flex-1 truncate font-mono text-sm text-zinc-300"
+                  [title]="selectedFile()?.filename || ''"
+                  >{{ selectedFile()?.filename }}</span
+                >
+                <span class="shrink-0 whitespace-nowrap text-xs text-text-muted"
+                  >{{ selectedFile()?.content | codeLines }} lines
+                  <span class="opacity-60"
+                    >· {{ selectedFile()?.content | codeChars }} chars</span
+                  ></span
+                >
+              </div>
+              <!-- Copy & Download buttons -->
+              <div class="flex shrink-0 gap-2">
+                <copy-file-button
+                  [textToCopy]="selectedFile()?.content || ''"
+                ></copy-file-button>
+                <download-file-button
+                  [textToDownload]="selectedFile()?.content || ''"
+                  [fileName]="selectedFile()?.filename || 'file.txt'"
+                ></download-file-button>
+              </div>
+            </div>
+            <div class="p-4 h-full overflow-hidden">
+              <app-code-viewer
+                [height]="'400px'"
+                [code]="selectedFile()?.content || ''"
+                [language]="language()"
+              >
+              </app-code-viewer>
+            </div>
+          </div>
         }
       </div>
     </div>

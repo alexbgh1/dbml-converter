@@ -1,0 +1,63 @@
+@if (open()) {
+  <div
+    class="fixed inset-0 z-[100] flex items-center justify-center bg-black/65 p-4"
+    (pointerdown)="onBackdropPointerDown($event)"
+  >
+    <section
+      class="flex max-h-[min(80vh,42rem)] w-[min(100%,32rem)] flex-col overflow-hidden rounded-lg border border-border-muted bg-bg-secondary shadow-2xl"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="title()"
+    >
+      <header
+        class="flex shrink-0 items-center gap-3 border-b border-border-muted px-4 py-3"
+      >
+        <h2 class="min-w-0 flex-1 text-sm font-medium text-text">
+          {{ title() }}
+        </h2>
+        <button
+          type="button"
+          class="rounded px-1.5 py-0.5 text-lg leading-none text-text-muted hover:bg-bg-tertiary hover:text-text focus-visible:outline-2 focus-visible:outline-accent"
+          (click)="dismissed.emit()"
+          aria-label="Close dialog"
+        >
+          &times;
+        </button>
+      </header>
+
+      <div class="min-h-0 overflow-y-auto p-4 text-sm text-zinc-300">
+        <ng-content></ng-content>
+      </div>
+
+      @if (primaryLabel() || secondaryLabel()) {
+        <footer
+          class="flex shrink-0 justify-end gap-2 border-t border-border-muted px-4 py-3"
+        >
+          @if (secondaryLabel()) {
+            <button
+              type="button"
+              class="rounded px-3 py-1.5 text-xs text-text-muted hover:bg-bg-tertiary cursor-pointer hover:text-text focus-visible:outline-2 focus-visible:outline-accent"
+              (click)="secondary.emit()"
+            >
+              {{ secondaryLabel() }}
+            </button>
+          }
+          @if (primaryLabel()) {
+            <button
+              type="button"
+              class="rounded px-3 py-1.5 text-xs cursor-pointer text-white focus-visible:outline-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50"
+              [class.bg-accent/60]="primaryTone() === 'default'"
+              [class.hover:bg-accent/70]="primaryTone() === 'default'"
+              [class.bg-red-700]="primaryTone() === 'danger'"
+              [class.hover:bg-red-700/90]="primaryTone() === 'danger'"
+              [disabled]="primaryDisabled()"
+              (click)="primary.emit()"
+            >
+              {{ primaryLabel() }}
+            </button>
+          }
+        </footer>
+      }
+    </section>
+  </div>
+}

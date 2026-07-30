@@ -1,4 +1,12 @@
-import { Component, Input, signal, WritableSignal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  Input,
+  inject,
+  signal,
+  WritableSignal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CopyIconComponent } from '../icons';
 
 @Component({
@@ -11,10 +19,18 @@ import { CopyIconComponent } from '../icons';
   templateUrl: './copy-file-button.component.html',
 })
 export class CopyFileButtonComponent {
+  private destroyRef = inject(DestroyRef);
+
   @Input() textToCopy: string = '';
 
   isCopied: WritableSignal<boolean> = signal(false);
-  private copyTimeout: any = null;
+  private copyTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      if (this.copyTimeout) clearTimeout(this.copyTimeout);
+    });
+  }
 
   copyToClipboard(event: MouseEvent) {
     event.stopPropagation();

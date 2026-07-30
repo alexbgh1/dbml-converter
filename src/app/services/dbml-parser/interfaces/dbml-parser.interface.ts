@@ -1,5 +1,3 @@
-import { COLUMN_ATTRIBUTES } from '../constants';
-
 export enum ReferentialAction {
   Cascade = 'CASCADE',
   SetNull = 'SET NULL',
@@ -19,9 +17,13 @@ export enum RelationOperator {
   ManyToMany = '<>',
 }
 
-export const CARDINALITY_MAP: Record<
-  RelationOperator,
-  { from: Cardinality; to: Cardinality }
+export interface RelationCardinality {
+  readonly from: Cardinality;
+  readonly to: Cardinality;
+}
+
+export const CARDINALITY_MAP: Readonly<
+  Record<RelationOperator, RelationCardinality>
 > = {
   [RelationOperator.ManyToOne]: {
     from: Cardinality.Many,
@@ -41,17 +43,11 @@ export const CARDINALITY_MAP: Record<
   },
 };
 
-export type ColumnAttribute =
-  (typeof COLUMN_ATTRIBUTES)[keyof typeof COLUMN_ATTRIBUTES][number];
-
 /* Reference to another column in a relation */
 export interface ColumnRef {
   table: string;
   column: string;
-  cardinality?: {
-    from: Cardinality;
-    to: Cardinality;
-  };
+  cardinality?: RelationCardinality;
   /* Optional actions for referential integrity */
   onUpdate?: ReferentialAction;
   onDelete?: ReferentialAction;
@@ -80,34 +76,73 @@ export interface Column {
   /* Default value (could be literal) */
   default?: string | number | boolean;
 
+  /* True when the default is a DB expression (e.g. `now()`), not a literal */
+  isExpression?: boolean;
+
   /* Auto-increment / identity column */
   increment?: boolean;
+
+  /* 1-based line in the DBML source (diagnostics navigation); stripped from JSON output */
+  sourceLine?: number;
+}
+
+/* Entry of a table-level "indexes { ... }" block */
+export interface TableIndex {
+  columns: string[];
+  unique?: boolean;
+  pk?: boolean;
+  name?: string;
+}
+
+/* DBML "Enum name { ... }" definition */
+export interface EnumDef {
+  name: string;
+  values: string[];
+
+  /* 1-based declaration/value lines; parser bookkeeping, stripped from JSON output */
+  sourceLine?: number;
+  valueSourceLines?: number[];
 }
 
 export interface Table {
   name: string;
   alias: string | null;
   columns: Column[];
+
+  /* Table created (or completed) as a many-to-many junction table */
+  isJunction?: boolean;
+
+  /* Table-level note */
+  note?: string;
+
+  /* Composite indexes declared in an "indexes { }" block */
+  indexes?: TableIndex[];
+
+  /* 1-based line in the DBML source (diagnostics navigation); stripped from JSON output */
+  sourceLine?: number;
 }
 
 /* Relation definition between tables */
 export interface Relation {
   from: { table: string; column: string };
   to: { table: string; column: string };
-  cardinality: {
-    from: Cardinality;
-    to: Cardinality;
-  };
+  cardinality: RelationCardinality;
 
   /* Optional actions for referential integrity */
-  onUpdate?: 'CASCADE' | 'SET NULL' | 'NO ACTION' | 'RESTRICT';
-  onDelete?: 'CASCADE' | 'SET NULL' | 'NO ACTION' | 'RESTRICT';
+  onUpdate?: ReferentialAction;
+  onDelete?: ReferentialAction;
+
+  /* 1-based line of the Ref (or inline ref) in the DBML source */
+  sourceLine?: number;
 }
 
 /* Global schema definition */
 export interface DatabaseSchema {
   tables: Table[];
   relations: Relation[];
+
+  /* Enum definitions */
+  enums?: EnumDef[];
 
   /* Optional metadata (e.g., database engine, version, etc.) */
   metadata?: Record<string, any>;

@@ -1,0 +1,9 @@
+Table users {
+  id int [pk]
+}
+
+Table roles {
+  id int [pk]
+}
+
+Ref users_roles: users.id <> roles.id

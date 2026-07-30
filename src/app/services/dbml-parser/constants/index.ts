@@ -1,34 +1,65 @@
-import { Cardinality } from '../interfaces/dbml-parser.interface';
-
 export const COLUMN_ATTRIBUTES = {
   PrimaryKey: ['pk', 'primary key'],
   Unique: ['unique'],
   NotNull: ['not null', 'nn'],
+  Nullable: ['null'],
   Increment: ['increment', 'auto_increment', 'identity'],
 } as const;
-
-export const DATA_TYPES = {
-  Integer: ['int', 'integer', 'bigint', 'smallint', 'tinyint'],
-  String: ['varchar', 'char', 'text', 'string'],
-  Date: ['date', 'datetime', 'timestamp', 'time'],
-  Boolean: ['bool', 'boolean'],
-  Float: ['float', 'double', 'decimal', 'real'],
-  Json: ['json', 'jsonb'],
-} as const;
-
-export const DEFAULT_CARDINALITY = {
-  from: Cardinality.One,
-  to: Cardinality.One,
-};
-
 /*
-  Special handle col names for better default value mapping
+  Normalized type families with EXACT alias lists (never substring matching:
+  'point' contains 'int' but is not an integer). Input is the lowercase base
+  type from parseDbType(), i.e. without (args).
 */
-export const CREATED_AT_FIELDS = ['created_at', 'createdat', 'creation_date'];
-export const UPDATED_AT_FIELDS = [
-  'updated_at',
-  'updatedat',
-  'modification_date',
-];
-export const DELETED_AT_FIELDS = ['deleted_at', 'deletedat', 'deletion_date'];
-export const TIME_FIELD = ['time', 'timestamp', 'timestamptz', 'datetime'];
+export type TypeFamily =
+  | 'integer'
+  | 'float'
+  | 'decimal'
+  | 'string'
+  | 'uuid'
+  | 'boolean'
+  | 'date'
+  | 'json';
+
+export const TYPE_FAMILIES: Record<TypeFamily, readonly string[]> = {
+  integer: [
+    'int',
+    'integer',
+    'int2',
+    'int4',
+    'int8',
+    'smallint',
+    'mediumint',
+    'tinyint',
+    'bigint',
+    'serial',
+    'smallserial',
+    'bigserial',
+  ],
+  float: ['float', 'float4', 'float8', 'double', 'real'],
+  decimal: ['decimal', 'numeric', 'money'],
+  string: [
+    'varchar',
+    'char',
+    'character',
+    'nvarchar',
+    'nchar',
+    'text',
+    'tinytext',
+    'mediumtext',
+    'longtext',
+    'citext',
+    'string',
+  ],
+  uuid: ['uuid', 'uniqueidentifier'],
+  boolean: ['bool', 'boolean', 'bit'],
+  date: [
+    'date',
+    'datetime',
+    'datetime2',
+    'timestamp',
+    'timestamptz',
+    'time',
+    'timetz',
+  ],
+  json: ['json', 'jsonb'],
+} as const;

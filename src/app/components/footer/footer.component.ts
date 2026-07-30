@@ -16,8 +16,8 @@ export class FooterComponent {
   isHomePage = toSignal(
     this.router.events.pipe(
       filter((event) => event instanceof NavigationEnd),
-      map(() => this.router.url === '/' || this.router.url === '')
+      map(() => this.router.url === '/' || this.router.url === ''),
     ),
-    { initialValue: this.router.url === '/' || this.router.url === '' }
+    { initialValue: this.router.url === '/' || this.router.url === '' },
   );
 }

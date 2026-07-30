@@ -12,6 +12,8 @@
   - Strings and values
 */
 
+import * as Prism from 'prismjs';
+
 (function (Prism: any) {
   Prism.languages.prisma = {
     comment: [

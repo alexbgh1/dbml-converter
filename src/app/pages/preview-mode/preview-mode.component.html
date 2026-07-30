@@ -8,28 +8,22 @@
     >
       <h2 class="text-sm font-medium text-text">Input</h2>
       <div class="flex justify-between flex-row gap-2">
-        <button
-          class="text-xs text-accent hover:underline"
-          (click)="handleLoadExample()"
-        >
-          Load example DBML code
-        </button>
-
-        <div class="flex gap-2">
-          <button
-            (click)="handleConvert()"
-            class="flex items-center gap-2 cursor-pointer px-2 bg-accent/60 text-white rounded disabled:cursor-not-allowed disabled:opacity-50"
-            [disabled]="isConverting()"
-          >
-            Convert
-          </button>
-          <button
-            (click)="clearAll()"
-            class="cursor-pointer px-2 rounded text-text-muted hover:text-text"
-          >
-            Clear
-          </button>
+        <div class="flex items-start gap-3">
+          <app-load-dbml-example-button
+            (loadRequested)="loadExample()"
+          ></app-load-dbml-example-button>
+          <!-- TODO: Consider future release -->
+          <!-- <app-import-dbml-button
+            [hasExistingContent]="!!dbmlContent().trim()"
+            (imported)="importDbml($event)"
+          ></app-import-dbml-button> -->
         </div>
+
+        <app-dbml-conversion-actions
+          [isConverting]="isConverting()"
+          (convertRequested)="handleConvert()"
+          (clearRequested)="clearAll()"
+        ></app-dbml-conversion-actions>
       </div>
     </div>
 
@@ -53,83 +47,106 @@
       <div class="flex flex-wrap items-center gap-2">
         <label class="text-sm text-text-muted">Output format:</label>
         <app-expanding-circle-button
-          [options]="expandingButtonOptions()"
+          [options]="expandingButtonOptions"
           [selectedId]="selectedOutputType()"
           (optionSelected)="setOutputType($event)"
         ></app-expanding-circle-button>
       </div>
     </div>
 
-    <!-- JSON Output -->
-    @if (selectedOutputType() === OUTPUT_OPTIONS.json) {
-    <div class="py-6 px-6 relative">
-      <!-- Copy & Download buttons -->
-      <div class="absolute flex right-10 top-8 gap-2">
-        <copy-file-button
-          [textToCopy]="schema() ? this.formatJson(schema()) : ''"
-        ></copy-file-button>
-        <download-file-button
-          [textToDownload]="schema() ? this.formatJson(schema()) : ''"
-          [fileName]="'schema.json'"
-        ></download-file-button>
+    @if (!hasConverted()) {
+      <div
+        class="flex min-h-[448px] flex-col items-center justify-center p-10 text-center"
+      >
+        <p class="text-text">No converted schema yet.</p>
+        <p class="mt-1 text-sm text-text-muted">Convert DBML to see output.</p>
       </div>
-
+    } @else {
       <!-- JSON Output -->
-      <app-code-viewer
-        [code]="schema() ? this.formatJson(schema()) : ''"
-        [height]="'400px'"
-        language="typescript"
-      ></app-code-viewer>
-    </div>
-    }
+      @if (selectedOutputType() === OUTPUT_OPTIONS.json) {
+        <div class="py-6 px-6 relative">
+          <!-- Copy & Download buttons -->
+          <div class="absolute flex right-10 top-8 gap-2">
+            <copy-file-button
+              [textToCopy]="formattedSchema()"
+            ></copy-file-button>
+            <download-file-button
+              [textToDownload]="formattedSchema()"
+              [fileName]="JSON_FILE.filename"
+            ></download-file-button>
+          </div>
 
-    <!-- NestJS TypeORM Output -->
-    @if (selectedOutputType() === OUTPUT_OPTIONS.typeorm) {
-    <div class="w-full overflow-y-auto rounded-sm">
-      @if (nestjsCode()) {
-      <!-- Content for entities -->
-      <div class="p-6">
-        @for (fileEntry of getEntities(nestjsCode()!.entities); track
-        fileEntry.fileName) {
-        <file-drop-down
-          [fileName]="fileEntry.fileName"
-          [charsCount]="fileEntry.code | codeChars"
-          [codeContent]="fileEntry.code"
-        ></file-drop-down>
-        }
-
-        <!-- Default Database Module -->
-        <file-drop-down
-          fileName="database.module.ts"
-          [charsCount]="nestjsCode()!.module | codeChars"
-          [codeContent]="nestjsCode()!.module"
-        ></file-drop-down>
-      </div>
+          <!-- JSON Output -->
+          <app-code-viewer
+            [code]="formattedSchema()"
+            [height]="'400px'"
+            language="typescript"
+          ></app-code-viewer>
+        </div>
       }
-    </div>
-    }
 
-    <!-- Prisma ORM Output -->
-    @if (selectedOutputType() === OUTPUT_OPTIONS.prisma) {
-    <div class="py-6 px-6 relative">
-      <!-- Copy & Download buttons -->
-      <div class="absolute flex right-10 top-8 gap-2">
-        <copy-file-button
-          [textToCopy]="prismaSchema() || ''"
-        ></copy-file-button>
-        <download-file-button
-          [textToDownload]="prismaSchema() || ''"
-          [fileName]="'schema.prisma'"
-        ></download-file-button>
-      </div>
+      <!-- NestJS TypeORM Output -->
+      @if (selectedOutputType() === OUTPUT_OPTIONS.typeorm) {
+        <div class="w-full overflow-y-auto rounded-sm">
+          @if (nestjsCode()) {
+            <!-- Content for entities -->
+            <div class="p-6">
+              @for (fileEntry of entityEntries(); track fileEntry.fileName) {
+                <file-drop-down
+                  [fileName]="fileEntry.fileName"
+                  [charsCount]="fileEntry.code | codeChars"
+                  [linesCount]="fileEntry.code | codeLines"
+                  [codeContent]="fileEntry.code"
+                ></file-drop-down>
+              }
 
-      <!-- JSON Output -->
-      <app-code-viewer
-        [code]="prismaSchema() || ''"
-        [height]="'400px'"
-        language="prisma"
-      ></app-code-viewer>
-    </div>
+              <!-- Default Database Module -->
+              <file-drop-down
+                [fileName]="DATABASE_FILE.filename"
+                [charsCount]="nestjsCode()!.module | codeChars"
+                [linesCount]="nestjsCode()!.module | codeLines"
+                [codeContent]="nestjsCode()!.module"
+              ></file-drop-down>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Prisma ORM Output -->
+      @if (selectedOutputType() === OUTPUT_OPTIONS.prisma) {
+        <div class="py-6 px-6 relative">
+          <!-- Copy & Download buttons -->
+          <div class="absolute flex right-10 top-8 gap-2">
+            <copy-file-button
+              [textToCopy]="prismaSchema() || ''"
+            ></copy-file-button>
+            <download-file-button
+              [textToDownload]="prismaSchema() || ''"
+              [fileName]="PRISMA_SCHEMA_FILE.filename"
+            ></download-file-button>
+          </div>
+
+          <!-- JSON Output -->
+          <app-code-viewer
+            [code]="prismaSchema() || ''"
+            [height]="'400px'"
+            language="prisma"
+          ></app-code-viewer>
+        </div>
+      }
     }
   </div>
+</div>
+<div class="mt-3 px-6">
+  @if (diagnosticsState().freshness !== "not-converted") {
+    <div class="mt-3">
+      <app-diagnostics-panel
+        [state]="diagnosticsState()"
+        (navigate)="goToLine($event)"
+        (repair)="applyRepair($event)"
+        (undo)="undoRepair()"
+        (validate)="handleConvert()"
+      ></app-diagnostics-panel>
+    </div>
+  }
 </div>

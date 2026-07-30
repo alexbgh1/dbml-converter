@@ -1,0 +1,6 @@
+Table users {
+  id int [pk, increment]
+  email varchar(255) [not null, unique]
+  nickname varchar [default: 'anonymous']
+  created_at timestamp [default: `now()`]
+}

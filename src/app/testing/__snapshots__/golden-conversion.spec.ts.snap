@@ -1,0 +1,1161 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`golden DBML conversions > matches every reviewed output for basic 1`] = `
+{
+  "diagnostics": [],
+  "json": "{
+  "tables": [
+    {
+      "name": "users",
+      "alias": null,
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "increment": true,
+          "nullable": false
+        },
+        {
+          "name": "email",
+          "type": "varchar(255)",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "nickname",
+          "type": "varchar",
+          "default": "anonymous",
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp",
+          "default": "now()",
+          "isExpression": true,
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "enums": []
+}",
+  "prisma": "generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id Int @id @default(autoincrement())
+  email String @unique @db.VarChar(255)
+  nickname String? @default("anonymous")
+  created_at DateTime? @default(now()) @map("created_at")
+
+  @@map("users")
+}
+",
+  "typeorm": {
+    "database.module.ts": "import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Users } from './users.entity';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Users])],
+  exports: [TypeOrmModule],
+})
+export class DatabaseModule {}
+",
+    "users.entity.ts": "import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+
+@Entity('users')
+export class Users {
+  @PrimaryGeneratedColumn('increment')
+  id!: number;
+
+  @Column({ type: 'varchar', length: 255, unique: true })
+  email!: string;
+
+  @Column({ type: 'varchar', nullable: true, default: "anonymous" })
+  nickname!: string | null;
+
+  @CreateDateColumn({ type: 'timestamptz', nullable: true, default: () => 'CURRENT_TIMESTAMP' })
+  created_at!: Date | null;
+}
+",
+  },
+}
+`;
+
+exports[`golden DBML conversions > matches every reviewed output for commerce 1`] = `
+{
+  "diagnostics": [],
+  "json": "{
+  "tables": [
+    {
+      "name": "users",
+      "alias": null,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "email",
+          "type": "varchar(255)",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "manager_id",
+          "type": "uuid",
+          "ref": {
+            "table": "users",
+            "column": "id",
+            "cardinality": {
+              "from": "many",
+              "to": "one"
+            }
+          },
+          "nullable": true
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp",
+          "nullable": false,
+          "default": "now()",
+          "isExpression": true
+        }
+      ]
+    },
+    {
+      "name": "products",
+      "alias": null,
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "increment": true,
+          "nullable": false
+        },
+        {
+          "name": "sku",
+          "type": "varchar(64)",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "name": "price",
+          "type": "decimal(10,2)",
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "orders",
+      "alias": null,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "customer_id",
+          "type": "uuid",
+          "nullable": false,
+          "ref": {
+            "table": "users",
+            "column": "id",
+            "cardinality": {
+              "from": "many",
+              "to": "one"
+            }
+          }
+        },
+        {
+          "name": "status",
+          "type": "order_status",
+          "nullable": false,
+          "default": "pending"
+        },
+        {
+          "name": "total",
+          "type": "decimal(10,2)",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp",
+          "nullable": false,
+          "default": "now()",
+          "isExpression": true
+        }
+      ]
+    },
+    {
+      "name": "order_items",
+      "alias": null,
+      "columns": [
+        {
+          "name": "order_id",
+          "type": "uuid",
+          "nullable": false,
+          "ref": {
+            "table": "orders",
+            "column": "id",
+            "cardinality": {
+              "from": "many",
+              "to": "one"
+            },
+            "onDelete": "CASCADE"
+          },
+          "pk": true
+        },
+        {
+          "name": "product_id",
+          "type": "int",
+          "nullable": false,
+          "ref": {
+            "table": "products",
+            "column": "id",
+            "cardinality": {
+              "from": "many",
+              "to": "one"
+            }
+          },
+          "pk": true
+        },
+        {
+          "name": "quantity",
+          "type": "int",
+          "nullable": false,
+          "default": 1
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "order_id",
+            "product_id"
+          ],
+          "pk": true,
+          "name": "pk_order_items"
+        },
+        {
+          "columns": [
+            "product_id"
+          ],
+          "name": "idx_order_items_product"
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "from": {
+        "table": "users",
+        "column": "manager_id"
+      },
+      "to": {
+        "table": "users",
+        "column": "id"
+      },
+      "cardinality": {
+        "from": "many",
+        "to": "one"
+      }
+    },
+    {
+      "from": {
+        "table": "orders",
+        "column": "customer_id"
+      },
+      "to": {
+        "table": "users",
+        "column": "id"
+      },
+      "cardinality": {
+        "from": "many",
+        "to": "one"
+      }
+    },
+    {
+      "from": {
+        "table": "order_items",
+        "column": "order_id"
+      },
+      "to": {
+        "table": "orders",
+        "column": "id"
+      },
+      "cardinality": {
+        "from": "many",
+        "to": "one"
+      },
+      "onDelete": "CASCADE"
+    },
+    {
+      "from": {
+        "table": "order_items",
+        "column": "product_id"
+      },
+      "to": {
+        "table": "products",
+        "column": "id"
+      },
+      "cardinality": {
+        "from": "many",
+        "to": "one"
+      }
+    }
+  ],
+  "enums": [
+    {
+      "name": "order_status",
+      "values": [
+        "pending",
+        "paid",
+        "cancelled"
+      ]
+    }
+  ]
+}",
+  "prisma": "generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  pending
+  paid
+  cancelled
+
+  @@map("order_status")
+}
+
+model Users {
+  id String @id @default(uuid()) @db.Uuid
+  email String @unique @db.VarChar(255)
+  manager_id String? @map("manager_id") @db.Uuid
+  created_at DateTime @default(now()) @map("created_at")
+
+  manager Users? @relation("Users_manager_id", fields: [manager_id], references: [id])
+  usersManager Users[] @relation("Users_manager_id")
+  orders Orders[]
+
+  @@map("users")
+}
+
+model Products {
+  id Int @id @default(autoincrement())
+  sku String @unique @db.VarChar(64)
+  price Decimal @db.Decimal(10, 2)
+
+  orderItems OrderItems[]
+
+  @@map("products")
+}
+
+model Orders {
+  id String @id @default(uuid()) @db.Uuid
+  customer_id String @map("customer_id") @db.Uuid
+  status OrderStatus @default(pending)
+  total Decimal @db.Decimal(10, 2)
+  created_at DateTime @default(now()) @map("created_at")
+
+  users Users @relation(fields: [customer_id], references: [id])
+  orderItems OrderItems[]
+
+  @@map("orders")
+}
+
+model OrderItems {
+  order_id String @map("order_id") @db.Uuid
+  product_id Int @map("product_id")
+  quantity Int @default(1)
+
+  orders Orders @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  products Products @relation(fields: [product_id], references: [id])
+
+  @@id([order_id, product_id], map: "pk_order_items")
+  @@index([product_id], map: "idx_order_items_product")
+  @@map("order_items")
+}
+",
+  "typeorm": {
+    "database.module.ts": "import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Users } from './users.entity';
+import { Products } from './products.entity';
+import { Orders } from './orders.entity';
+import { OrderItems } from './order_items.entity';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Users, Products, Orders, OrderItems])],
+  exports: [TypeOrmModule],
+})
+export class DatabaseModule {}
+",
+    "enums.ts": "export enum OrderStatus {
+  pending = 'pending',
+  paid = 'paid',
+  cancelled = 'cancelled',
+}
+",
+    "order_items.entity.ts": "import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
+import { Orders } from './orders.entity';
+import { Products } from './products.entity';
+
+@Entity('order_items')
+@Index("idx_order_items_product", ['product_id'])
+export class OrderItems {
+  @PrimaryColumn({ type: 'uuid', name: 'order_id', primaryKeyConstraintName: "pk_order_items" })
+  order_id!: string;
+
+  @ManyToOne(() => Orders, orders => orders.orderItems, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'order_id', referencedColumnName: 'id' })
+  orders!: Orders;
+
+  @PrimaryColumn({ type: 'int', name: 'product_id', primaryKeyConstraintName: "pk_order_items" })
+  product_id!: number;
+
+  @ManyToOne(() => Products, products => products.orderItems, { nullable: false })
+  @JoinColumn({ name: 'product_id', referencedColumnName: 'id' })
+  products!: Products;
+
+  @Column({ type: 'int', default: 1 })
+  quantity!: number;
+}
+",
+    "orders.entity.ts": "import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, OneToMany } from 'typeorm';
+import { Users } from './users.entity';
+import { OrderItems } from './order_items.entity';
+import { OrderStatus } from './enums';
+
+@Entity('orders')
+export class Orders {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+
+  @ManyToOne(() => Users, users => users.orders, { nullable: false })
+  @JoinColumn({ name: 'customer_id' })
+  users!: Users;
+
+  @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.pending })
+  status!: OrderStatus;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  total!: number;
+
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  created_at!: Date;
+
+  @OneToMany(() => OrderItems, orderItems => orderItems.orders)
+  orderItems!: OrderItems[];
+}
+",
+    "products.entity.ts": "import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { OrderItems } from './order_items.entity';
+
+@Entity('products')
+export class Products {
+  @PrimaryGeneratedColumn('increment')
+  id!: number;
+
+  @Column({ type: 'varchar', length: 64, unique: true })
+  sku!: string;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  price!: number;
+
+  @OneToMany(() => OrderItems, orderItems => orderItems.products)
+  orderItems!: OrderItems[];
+}
+",
+    "users.entity.ts": "import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, OneToMany } from 'typeorm';
+import { Orders } from './orders.entity';
+
+@Entity('users')
+export class Users {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+
+  @Column({ type: 'varchar', length: 255, unique: true })
+  email!: string;
+
+  @ManyToOne(() => Users, users => users.usersManager)
+  @JoinColumn({ name: 'manager_id' })
+  manager!: Users | null;
+
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  created_at!: Date;
+
+  @OneToMany(() => Users, users => users.manager)
+  usersManager!: Users[];
+
+  @OneToMany(() => Orders, orders => orders.users)
+  orders!: Orders[];
+}
+",
+  },
+}
+`;
+
+exports[`golden DBML conversions > matches every reviewed output for diagnostics-invalid 1`] = `
+{
+  "diagnostics": [
+    {
+      "code": "SCHEMA_UNKNOWN_REFERENCE_COLUMN",
+      "details": {
+        "availableTargetColumns": [
+          "customer_uuid",
+        ],
+        "target": "customers.id",
+      },
+      "line": 7,
+      "message": "orders.customer_id references customers.id, but customers.id does not exist.",
+      "phase": "schema-validation",
+      "repairs": [
+        {
+          "expectedText": "customers.id",
+          "kind": "replace-reference-target",
+          "label": "Reference customers.customer_uuid",
+          "line": 7,
+          "replacementText": "customers.customer_uuid",
+        },
+      ],
+      "schemaPath": "tables.orders.columns.customer_id",
+      "severity": "error",
+      "suggestion": "Reference one of: customers.customer_uuid — or declare customers.id.",
+    },
+    {
+      "code": "OUTPUT_UNKNOWN_TYPE_FALLBACK",
+      "details": {
+        "fallback": "String",
+        "type": "geography",
+      },
+      "line": 8,
+      "message": "Type "geography" of orders.location is not supported by the Prisma mapper and was mapped to String.",
+      "phase": "output-validation",
+      "schemaPath": "tables.orders.columns.location",
+      "severity": "warning",
+      "target": "prisma",
+    },
+    {
+      "code": "OUTPUT_UNKNOWN_TYPE_FALLBACK",
+      "details": {
+        "fallback": "varchar",
+        "type": "geography",
+      },
+      "line": 8,
+      "message": "Type "geography" of orders.location is not supported by the TypeORM mapper and was mapped to varchar.",
+      "phase": "output-validation",
+      "schemaPath": "tables.orders.columns.location",
+      "severity": "warning",
+      "target": "typeorm",
+    },
+  ],
+  "json": "{
+  "tables": [
+    {
+      "name": "customers",
+      "alias": null,
+      "columns": [
+        {
+          "name": "customer_uuid",
+          "type": "uuid",
+          "pk": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "orders",
+      "alias": null,
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        },
+        {
+          "name": "customer_id",
+          "type": "int",
+          "ref": {
+            "table": "customers",
+            "column": "id",
+            "cardinality": {
+              "from": "many",
+              "to": "one"
+            }
+          },
+          "nullable": true
+        },
+        {
+          "name": "location",
+          "type": "geography",
+          "nullable": true
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "from": {
+        "table": "orders",
+        "column": "customer_id"
+      },
+      "to": {
+        "table": "customers",
+        "column": "id"
+      },
+      "cardinality": {
+        "from": "many",
+        "to": "one"
+      }
+    }
+  ],
+  "enums": []
+}",
+  "prisma": "generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Customers {
+  customer_uuid String @id @default(uuid()) @map("customer_uuid") @db.Uuid
+
+  orders Orders[]
+
+  @@map("customers")
+}
+
+model Orders {
+  id Int @id
+  customer_id Int? @map("customer_id")
+  location String?
+
+  customers Customers? @relation(fields: [customer_id], references: [id])
+
+  @@map("orders")
+}
+",
+  "typeorm": {
+    "customers.entity.ts": "import { Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Orders } from './orders.entity';
+
+@Entity('customers')
+export class Customers {
+  @PrimaryGeneratedColumn('uuid')
+  customer_uuid!: string;
+
+  @OneToMany(() => Orders, orders => orders.customers)
+  orders!: Orders[];
+}
+",
+    "database.module.ts": "import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Customers } from './customers.entity';
+import { Orders } from './orders.entity';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Customers, Orders])],
+  exports: [TypeOrmModule],
+})
+export class DatabaseModule {}
+",
+    "orders.entity.ts": "import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Customers } from './customers.entity';
+
+@Entity('orders')
+export class Orders {
+  @PrimaryColumn({ type: 'int' })
+  id!: number;
+
+  @ManyToOne(() => Customers, customers => customers.orders)
+  @JoinColumn({ name: 'customer_id' })
+  customers!: Customers | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  location!: string | null;
+}
+",
+  },
+}
+`;
+
+exports[`golden DBML conversions > matches every reviewed output for enums-indexes 1`] = `
+{
+  "diagnostics": [],
+  "json": "{
+  "tables": [
+    {
+      "name": "orders",
+      "alias": null,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": false,
+          "pk": true
+        },
+        {
+          "name": "tenant_id",
+          "type": "int",
+          "nullable": false
+        },
+        {
+          "name": "status",
+          "type": "order_status",
+          "default": "pending",
+          "nullable": true
+        },
+        {
+          "name": "reference",
+          "type": "varchar",
+          "nullable": true,
+          "unique": true
+        }
+      ],
+      "indexes": [
+        {
+          "columns": [
+            "id"
+          ],
+          "pk": true,
+          "name": "pk_orders"
+        },
+        {
+          "columns": [
+            "reference"
+          ],
+          "unique": true,
+          "name": "uq_orders_reference"
+        },
+        {
+          "columns": [
+            "tenant_id",
+            "status"
+          ],
+          "name": "idx_orders_tenant_status"
+        }
+      ]
+    }
+  ],
+  "relations": [],
+  "enums": [
+    {
+      "name": "order_status",
+      "values": [
+        "pending",
+        "approved",
+        "cancelled"
+      ]
+    }
+  ]
+}",
+  "prisma": "generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  pending
+  approved
+  cancelled
+
+  @@map("order_status")
+}
+
+model Orders {
+  id String @id(map: "pk_orders") @default(uuid()) @db.Uuid
+  tenant_id Int @map("tenant_id")
+  status OrderStatus? @default(pending)
+  reference String?
+
+  @@unique([reference], map: "uq_orders_reference")
+  @@index([tenant_id, status], map: "idx_orders_tenant_status")
+  @@map("orders")
+}
+",
+  "typeorm": {
+    "database.module.ts": "import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Orders } from './orders.entity';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Orders])],
+  exports: [TypeOrmModule],
+})
+export class DatabaseModule {}
+",
+    "enums.ts": "export enum OrderStatus {
+  pending = 'pending',
+  approved = 'approved',
+  cancelled = 'cancelled',
+}
+",
+    "orders.entity.ts": "import { Entity, Column, PrimaryGeneratedColumn, Index } from 'typeorm';
+import { OrderStatus } from './enums';
+
+@Entity('orders')
+@Index("uq_orders_reference", ['reference'], { unique: true })
+@Index("idx_orders_tenant_status", ['tenant_id', 'status'])
+export class Orders {
+  @PrimaryGeneratedColumn('uuid', { primaryKeyConstraintName: "pk_orders" })
+  id!: string;
+
+  @Column({ type: 'int' })
+  tenant_id!: number;
+
+  @Column({ type: 'enum', enum: OrderStatus, nullable: true, default: OrderStatus.pending })
+  status!: OrderStatus | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  reference!: string | null;
+}
+",
+  },
+}
+`;
+
+exports[`golden DBML conversions > matches every reviewed output for junctions 1`] = `
+{
+  "diagnostics": [
+    {
+      "code": "SCHEMA_JUNCTION_TABLE_CREATED",
+      "details": {
+        "addedColumns": [
+          "users_id",
+          "roles_id",
+        ],
+      },
+      "line": 9,
+      "message": "Created junction table "users_roles" for users.id <> roles.id.",
+      "phase": "parse",
+      "schemaPath": "tables.users_roles",
+      "severity": "info",
+    },
+  ],
+  "json": "{
+  "tables": [
+    {
+      "name": "users",
+      "alias": null,
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "roles",
+      "alias": null,
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "users_roles",
+      "alias": null,
+      "isJunction": true,
+      "columns": [
+        {
+          "name": "users_id",
+          "type": "int",
+          "pk": true,
+          "nullable": false,
+          "ref": {
+            "table": "users",
+            "column": "id",
+            "cardinality": {
+              "from": "many",
+              "to": "one"
+            }
+          }
+        },
+        {
+          "name": "roles_id",
+          "type": "int",
+          "pk": true,
+          "nullable": false,
+          "ref": {
+            "table": "roles",
+            "column": "id",
+            "cardinality": {
+              "from": "many",
+              "to": "one"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "from": {
+        "table": "users",
+        "column": "id"
+      },
+      "to": {
+        "table": "roles",
+        "column": "id"
+      },
+      "cardinality": {
+        "from": "many",
+        "to": "many"
+      }
+    }
+  ],
+  "enums": []
+}",
+  "prisma": "generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id Int @id
+
+  usersRoles UsersRoles[]
+
+  @@map("users")
+}
+
+model Roles {
+  id Int @id
+
+  usersRoles UsersRoles[]
+
+  @@map("roles")
+}
+
+model UsersRoles {
+  users_id Int @map("users_id")
+  roles_id Int @map("roles_id")
+
+  users Users @relation(fields: [users_id], references: [id])
+  roles Roles @relation(fields: [roles_id], references: [id])
+
+  @@id([users_id, roles_id])
+  @@map("users_roles")
+}
+",
+  "typeorm": {
+    "database.module.ts": "import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Users } from './users.entity';
+import { Roles } from './roles.entity';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Users, Roles])],
+  exports: [TypeOrmModule],
+})
+export class DatabaseModule {}
+",
+    "roles.entity.ts": "import { Entity, PrimaryColumn, ManyToMany } from 'typeorm';
+import { Users } from './users.entity';
+
+@Entity('roles')
+export class Roles {
+  @PrimaryColumn({ type: 'int' })
+  id!: number;
+
+  @ManyToMany(() => Users, users => users.roles)
+  users!: Users[];
+}
+",
+    "users.entity.ts": "import { Entity, PrimaryColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Roles } from './roles.entity';
+
+@Entity('users')
+export class Users {
+  @PrimaryColumn({ type: 'int' })
+  id!: number;
+
+  @ManyToMany(() => Roles, roles => roles.users)
+  @JoinTable({
+    name: 'users_roles',
+    joinColumn: { name: 'users_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'roles_id', referencedColumnName: 'id' },
+  })
+  roles!: Roles[];
+}
+",
+  },
+}
+`;
+
+exports[`golden DBML conversions > matches every reviewed output for relations 1`] = `
+{
+  "diagnostics": [],
+  "json": "{
+  "tables": [
+    {
+      "name": "users",
+      "alias": null,
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "pk": true,
+          "nullable": false
+        }
+      ]
+    },
+    {
+      "name": "posts",
+      "alias": null,
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "pk": true,
+          "increment": true,
+          "nullable": false
+        },
+        {
+          "name": "author_id",
+          "type": "uuid",
+          "nullable": false,
+          "ref": {
+            "table": "users",
+            "column": "id",
+            "cardinality": {
+              "from": "many",
+              "to": "one"
+            },
+            "onDelete": "CASCADE"
+          }
+        },
+        {
+          "name": "title",
+          "type": "varchar",
+          "nullable": false
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "from": {
+        "table": "posts",
+        "column": "author_id"
+      },
+      "to": {
+        "table": "users",
+        "column": "id"
+      },
+      "cardinality": {
+        "from": "many",
+        "to": "one"
+      },
+      "onDelete": "CASCADE"
+    }
+  ],
+  "enums": []
+}",
+  "prisma": "generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id String @id @default(uuid()) @db.Uuid
+
+  posts Posts[]
+
+  @@map("users")
+}
+
+model Posts {
+  id Int @id @default(autoincrement())
+  author_id String @map("author_id") @db.Uuid
+  title String
+
+  users Users @relation(fields: [author_id], references: [id], onDelete: Cascade)
+
+  @@map("posts")
+}
+",
+  "typeorm": {
+    "database.module.ts": "import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Users } from './users.entity';
+import { Posts } from './posts.entity';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([Users, Posts])],
+  exports: [TypeOrmModule],
+})
+export class DatabaseModule {}
+",
+    "posts.entity.ts": "import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Users } from './users.entity';
+
+@Entity('posts')
+export class Posts {
+  @PrimaryGeneratedColumn('increment')
+  id!: number;
+
+  @ManyToOne(() => Users, users => users.posts, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'author_id' })
+  users!: Users;
+
+  @Column({ type: 'varchar' })
+  title!: string;
+}
+",
+    "users.entity.ts": "import { Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Posts } from './posts.entity';
+
+@Entity('users')
+export class Users {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+
+  @OneToMany(() => Posts, posts => posts.users)
+  posts!: Posts[];
+}
+",
+  },
+}
+`;

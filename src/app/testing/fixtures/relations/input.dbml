@@ -1,0 +1,9 @@
+Table users {
+  id uuid [pk]
+}
+
+Table posts {
+  id int [pk, increment]
+  author_id uuid [not null, ref: > users.id, delete: cascade]
+  title varchar [not null]
+}

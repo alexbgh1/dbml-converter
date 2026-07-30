@@ -1,0 +1,29 @@
+Table enterprise_user_accounts_with_extended_identity {
+  id bigint [pk]
+  display_name varchar(255) [not null]
+}
+
+Table very_long_audit_event_archive_table_name {
+  id bigint [pk]
+  archive_partition_key varchar(120) [not null]
+  source_system_identifier varchar(160) [not null]
+  source_record_identifier varchar(160) [not null]
+  event_category_with_extended_description varchar(255) [not null]
+  serialized_payload_with_original_envelope varchar(1024)
+  payload_format_version varchar(64) [not null]
+  occurred_at timestamp [not null]
+  ingested_at timestamp [not null]
+  retained_until timestamp
+  legal_hold_reason_with_a_long_name varchar(512)
+  compression_algorithm_identifier varchar(128)
+  encryption_key_identifier_with_revision varchar(255)
+  storage_bucket_identifier_with_region varchar(255) [not null]
+  owner_account_identifier_with_long_name bigint [not null, ref: > enterprise_user_accounts_with_extended_identity.id]
+  integrity_checksum_with_algorithm_prefix varchar(255) [not null, unique]
+  processing_notes_for_downstream_consumers varchar(1024)
+}
+
+Table completely_isolated_reference_catalog {
+  code varchar(120) [pk]
+  human_readable_description_with_long_name varchar(512) [not null]
+}
